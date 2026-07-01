@@ -10,10 +10,10 @@ import { TrainerCard } from '../components/TrainerCard';
 type Props = NativeStackScreenProps<TrainerStackParamList, 'Summary'>;
 
 export const SummaryScreen: React.FC<Props> = ({ navigation }) => {
-  const { profile, resetProfile } = useTrainerStore();
+  const { profile, startEdit } = useTrainerStore();
 
   const handleEditProfile = () => {
-    resetProfile();
+    startEdit();
     navigation.navigate('Step1PersonalData');
   };
 

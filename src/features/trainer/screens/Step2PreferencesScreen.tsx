@@ -1,4 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -23,19 +24,33 @@ const typeEmoji: Record<PokemonType, string> = {
 };
 
 export const Step2PreferencesScreen: React.FC<Props> = ({ navigation }) => {
-  const { setStep2Data, profile } = useTrainerStore();
+  const { setStep2Data, profile, isEditing } = useTrainerStore();
 
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<Step2FormValues>({
     resolver: yupResolver(step2Schema),
     defaultValues: {
-      district: profile?.district ?? undefined,
-      favoritePokemonType: profile?.favoritePokemonType ?? undefined,
+      district: undefined,
+      favoritePokemonType: undefined,
     },
   });
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (isEditing) {
+        reset({
+          district: profile?.district ?? undefined,
+          favoritePokemonType: profile?.favoritePokemonType ?? undefined,
+        });
+      } else {
+        reset({ district: undefined, favoritePokemonType: undefined });
+      }
+    }, [isEditing, profile, reset])
+  );
 
   const onSubmit = (data: Step2FormValues) => {
     setStep2Data({ district: data.district!, favoritePokemonType: data.favoritePokemonType! });

@@ -3,6 +3,7 @@ import React from 'react';
 import { Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '../constants/colors';
+import { useTrainerStore } from '../store/trainerStore';
 import { PokedexStack } from './PokedexStack';
 import { TrainerStack } from './TrainerStack';
 import { RootTabParamList } from './types';
@@ -51,6 +52,13 @@ export const RootNavigator: React.FC = () => {
           tabBarLabel: 'Entrenador',
           tabBarIcon: ({ focused }) => <TabIcon emoji="🎒" focused={focused} />,
         }}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            e.preventDefault();
+            useTrainerStore.getState().startCreate();
+            navigation.navigate('Trainer', { screen: 'Step1PersonalData' });
+          },
+        })}
       />
     </Tab.Navigator>
   );

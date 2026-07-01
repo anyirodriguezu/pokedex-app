@@ -17,7 +17,10 @@ export interface TrainerProfile extends Step1Data, Step2Data {}
 export interface TrainerStoreState {
   profile: TrainerProfile | null;
   step1Data: Step1Data | null;
+  isEditing: boolean;
   setStep1Data: (data: Step1Data) => void;
   setStep2Data: (data: Step2Data) => void;
   resetProfile: () => void;
+  startEdit: () => void;
+  startCreate: () => void;
 }

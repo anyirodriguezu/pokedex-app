@@ -9,6 +9,7 @@ import {
 export const useTrainerStore = create<TrainerStoreState>((set, get) => ({
   profile: null,
   step1Data: null,
+  isEditing: false,
 
   setStep1Data: (data: Step1Data) => {
     set({ step1Data: data });
@@ -22,6 +23,14 @@ export const useTrainerStore = create<TrainerStoreState>((set, get) => ({
   },
 
   resetProfile: () => {
-    set({ profile: null, step1Data: null });
+    set({ profile: null, step1Data: null, isEditing: false });
+  },
+
+  startEdit: () => {
+    set({ isEditing: true });
+  },
+
+  startCreate: () => {
+    set({ isEditing: false, step1Data: null });
   },
 }));
