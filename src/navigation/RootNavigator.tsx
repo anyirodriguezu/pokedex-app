@@ -1,6 +1,7 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
 import { Text } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '../constants/colors';
 import { PokedexStack } from './PokedexStack';
 import { TrainerStack } from './TrainerStack';
@@ -13,6 +14,8 @@ const TabIcon = ({ emoji, focused }: { emoji: string; focused: boolean }) => (
 );
 
 export const RootNavigator: React.FC = () => {
+  const insets = useSafeAreaInsets();
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -23,8 +26,8 @@ export const RootNavigator: React.FC = () => {
           backgroundColor: Colors.tabBar,
           borderTopWidth: 1,
           borderTopColor: Colors.border,
-          paddingBottom: 4,
-          height: 60,
+          paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
+          height: 60 + (insets.bottom > 0 ? insets.bottom : 8),
         },
         tabBarLabelStyle: {
           fontSize: 12,

@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
   },
   list: {
     padding: 6,
-    paddingBottom: 20,
+    paddingBottom: 16,
   },
   footer: {
     paddingVertical: 20,
