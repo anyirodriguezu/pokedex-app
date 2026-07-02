@@ -1,6 +1,6 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { Colors } from '../../../constants/colors';
+import { StyleSheet, Text as RNText } from 'react-native';
+import { XStack, YStack } from 'tamagui';
 
 interface StepIndicatorProps {
   currentStep: number;
@@ -9,75 +9,52 @@ interface StepIndicatorProps {
 
 export const StepIndicator: React.FC<StepIndicatorProps> = ({ currentStep, totalSteps }) => {
   return (
-    <View style={styles.container}>
-      {Array.from({ length: totalSteps }, (_, i) => i + 1).map((step) => (
-        <React.Fragment key={step}>
-          <View
-            style={[
-              styles.circle,
-              step < currentStep && styles.completed,
-              step === currentStep && styles.active,
-            ]}
-          >
-            <Text
-              style={[
-                styles.circleText,
-                (step <= currentStep) && styles.circleTextActive,
-              ]}
+    <XStack items="center" justify="center" py="$4">
+      {Array.from({ length: totalSteps }, (_, i) => i + 1).map((step) => {
+        const isActive = step === currentStep;
+        const isCompleted = step < currentStep;
+        const filled = isActive || isCompleted;
+
+        return (
+          <React.Fragment key={step}>
+            <YStack
+              width={36}
+              height={36}
+              rounded={18}
+              borderWidth={2}
+              borderColor={filled ? '$primary' : '$appBorder'}
+              bg={filled ? '$primary' : '$surface'}
+              items="center"
+              justify="center"
             >
-              {step < currentStep ? '✓' : step}
-            </Text>
-          </View>
-          {step < totalSteps && (
-            <View style={[styles.line, step < currentStep && styles.lineCompleted]} />
-          )}
-        </React.Fragment>
-      ))}
-    </View>
+              <RNText style={[styles.stepLabel, filled ? styles.stepLabelFilled : styles.stepLabelEmpty]}>
+                {isCompleted ? '✓' : step}
+              </RNText>
+            </YStack>
+            {step < totalSteps && (
+              <YStack
+                flex={1}
+                height={2}
+                maxW={60}
+                bg={isCompleted ? '$primary' : '$appBorder'}
+              />
+            )}
+          </React.Fragment>
+        );
+      })}
+    </XStack>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    gap: 0,
-  },
-  circle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    borderWidth: 2,
-    borderColor: Colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.surface,
-  },
-  active: {
-    borderColor: Colors.primary,
-    backgroundColor: Colors.primary,
-  },
-  completed: {
-    borderColor: Colors.primary,
-    backgroundColor: Colors.primary,
-  },
-  circleText: {
+  stepLabel: {
     fontSize: 14,
     fontWeight: '700',
-    color: Colors.textSecondary,
   },
-  circleTextActive: {
-    color: Colors.textLight,
+  stepLabelFilled: {
+    color: '#FFFFFF',
   },
-  line: {
-    flex: 1,
-    height: 2,
-    backgroundColor: Colors.border,
-    maxWidth: 60,
-  },
-  lineCompleted: {
-    backgroundColor: Colors.primary,
+  stepLabelEmpty: {
+    color: '#757575',
   },
 });

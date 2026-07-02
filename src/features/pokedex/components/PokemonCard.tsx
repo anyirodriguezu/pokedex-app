@@ -1,77 +1,43 @@
 import React from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { Colors } from '../../../constants/colors';
+import { Image } from 'react-native';
+import { Card, Text, YStack } from 'tamagui';
 import { capitalize, getPokemonImageUrl } from '../../../utils/pokemonHelpers';
 import { PokemonWithId } from '../types/pokemon.types';
 
 interface PokemonCardProps {
   pokemon: PokemonWithId;
-  onPress: () => void;
+  onPress: (id: number, name: string) => void;
 }
 
-export const PokemonCard: React.FC<PokemonCardProps> = ({ pokemon, onPress }) => {
+export const PokemonCard = React.memo(function PokemonCard({ pokemon, onPress }: PokemonCardProps) {
   const imageUrl = getPokemonImageUrl(pokemon.id);
 
   return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+    <Card
+      flex={1}
+      m="$1.5"
+      bg="$surface"
+      rounded={16}
+      overflow="hidden"
+      elevation={3}
+      pressStyle={{ opacity: 0.85, scale: 0.97 }}
+      onPress={() => onPress(pokemon.id, pokemon.name)}
     >
-      <View style={styles.imageContainer}>
+      <YStack bg="$appBackground" items="center" pt="$3" pb="$1">
         <Image
           source={{ uri: imageUrl }}
-          style={styles.image}
+          style={{ width: 100, height: 100 }}
           resizeMode="contain"
         />
-      </View>
-      <View style={styles.info}>
-        <Text style={styles.number}>#{String(pokemon.id).padStart(3, '0')}</Text>
-        <Text style={styles.name}>{capitalize(pokemon.name)}</Text>
-      </View>
-    </Pressable>
+      </YStack>
+      <YStack p="$2.5" items="center">
+        <Text fontSize={12} color="$textSecondary" fontWeight="500">
+          #{String(pokemon.id).padStart(3, '0')}
+        </Text>
+        <Text fontSize={14} fontWeight="700" color="$appText" mt="$0.5">
+          {capitalize(pokemon.name)}
+        </Text>
+      </YStack>
+    </Card>
   );
-};
-
-const styles = StyleSheet.create({
-  card: {
-    flex: 1,
-    margin: 6,
-    backgroundColor: Colors.surface,
-    borderRadius: 16,
-    overflow: 'hidden',
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  pressed: {
-    opacity: 0.85,
-    transform: [{ scale: 0.97 }],
-  },
-  imageContainer: {
-    backgroundColor: Colors.background,
-    alignItems: 'center',
-    paddingTop: 12,
-    paddingBottom: 4,
-  },
-  image: {
-    width: 100,
-    height: 100,
-  },
-  info: {
-    padding: 10,
-    alignItems: 'center',
-  },
-  number: {
-    fontSize: 12,
-    color: Colors.textSecondary,
-    fontWeight: '500',
-  },
-  name: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: Colors.text,
-    marginTop: 2,
-  },
 });

@@ -1,6 +1,6 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { Colors } from '../../../constants/colors';
+import { StyleSheet, View } from 'react-native';
+import { Card, Text, XStack } from 'tamagui';
 import { formatStatName } from '../../../utils/pokemonHelpers';
 import { PokemonStat } from '../types/pokemon.types';
 
@@ -8,69 +8,45 @@ interface PokemonStatsProps {
   stats: PokemonStat[];
 }
 
-export const PokemonStats: React.FC<PokemonStatsProps> = ({ stats }) => {
-  const maxStat = 255;
+const MAX_STAT = 255;
 
+export const PokemonStats: React.FC<PokemonStatsProps> = ({ stats }) => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Estadísticas Base</Text>
+    <Card bg="$surface" rounded={16} p="$4" gap="$2.5">
+      <Text fontSize={18} fontWeight="700" color="$appText" mb="$1">
+        Estadísticas Base
+      </Text>
       {stats.map((stat) => {
-        const percentage = (stat.base_stat / maxStat) * 100;
+        const percentage = (stat.base_stat / MAX_STAT) * 100;
         return (
-          <View key={stat.stat.name} style={styles.statRow}>
-            <Text style={styles.statName}>{formatStatName(stat.stat.name)}</Text>
-            <Text style={styles.statValue}>{stat.base_stat}</Text>
-            <View style={styles.barBackground}>
+          <XStack key={stat.stat.name} items="center" gap="$2">
+            <Text width={80} fontSize={13} color="$textSecondary" fontWeight="500">
+              {formatStatName(stat.stat.name)}
+            </Text>
+            <Text width={36} fontSize={13} fontWeight="700" color="$appText" text="right">
+              {stat.base_stat}
+            </Text>
+            <View style={styles.barTrack}>
               <View style={[styles.barFill, { width: `${percentage}%` }]} />
             </View>
-          </View>
+          </XStack>
         );
       })}
-    </View>
+    </Card>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: Colors.surface,
-    borderRadius: 16,
-    padding: 16,
-    gap: 10,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: Colors.text,
-    marginBottom: 4,
-  },
-  statRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  statName: {
-    width: 80,
-    fontSize: 13,
-    color: Colors.textSecondary,
-    fontWeight: '500',
-  },
-  statValue: {
-    width: 36,
-    fontSize: 13,
-    fontWeight: '700',
-    color: Colors.text,
-    textAlign: 'right',
-  },
-  barBackground: {
+  barTrack: {
     flex: 1,
     height: 8,
-    backgroundColor: Colors.border,
+    backgroundColor: '#E0E0E0',
     borderRadius: 4,
     overflow: 'hidden',
   },
   barFill: {
     height: '100%',
-    backgroundColor: Colors.primary,
+    backgroundColor: '#E3350D',
     borderRadius: 4,
   },
 });

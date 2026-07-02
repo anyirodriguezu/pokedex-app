@@ -1,6 +1,6 @@
 import React from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import { Colors } from '../../../constants/colors';
+import { ActivityIndicator } from 'react-native';
+import { Text, YStack } from 'tamagui';
 
 interface LoadingStateProps {
   message?: string;
@@ -8,22 +8,11 @@ interface LoadingStateProps {
 
 export const LoadingState: React.FC<LoadingStateProps> = ({ message = 'Cargando...' }) => {
   return (
-    <View style={styles.container}>
-      <ActivityIndicator size="large" color={Colors.primary} />
-      <Text style={styles.message}>{message}</Text>
-    </View>
+    <YStack flex={1} items="center" justify="center" gap="$3">
+      <ActivityIndicator size="large" color="#E3350D" />
+      <Text fontSize={16} color="$textSecondary">
+        {message}
+      </Text>
+    </YStack>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-  },
-  message: {
-    fontSize: 16,
-    color: Colors.textSecondary,
-  },
-});

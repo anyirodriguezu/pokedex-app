@@ -1,6 +1,6 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { Colors } from '../../constants/colors';
+import { StyleSheet, Text as RNText } from 'react-native';
+import { Text, YStack } from 'tamagui';
 import { Button } from './Button';
 
 interface ErrorStateProps {
@@ -13,30 +13,18 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
   onRetry,
 }) => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.emoji}>⚠️</Text>
-      <Text style={styles.message}>{message}</Text>
-      {onRetry && (
-        <Button label="Reintentar" onPress={onRetry} />
-      )}
-    </View>
+    <YStack flex={1} items="center" justify="center" p="$6" gap="$4">
+      <RNText style={styles.emoji}>⚠️</RNText>
+      <Text fontSize={16} color="$error" text="center">
+        {message}
+      </Text>
+      {onRetry && <Button label="Reintentar" onPress={onRetry} />}
+    </YStack>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
-    gap: 16,
-  },
   emoji: {
     fontSize: 48,
-  },
-  message: {
-    fontSize: 16,
-    color: Colors.error,
-    textAlign: 'center',
   },
 });

@@ -1,6 +1,6 @@
 import React from 'react';
-import { StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native';
-import { Colors } from '../../../constants/colors';
+import { TextInputProps } from 'react-native';
+import { Input, Label, Text, YStack } from 'tamagui';
 
 interface FormFieldProps extends TextInputProps {
   label: string;
@@ -9,43 +9,37 @@ interface FormFieldProps extends TextInputProps {
 
 export const FormField: React.FC<FormFieldProps> = ({ label, error, ...inputProps }) => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>{label}</Text>
-      <TextInput
-        style={[styles.input, error ? styles.inputError : null]}
-        placeholderTextColor={Colors.textSecondary}
-        {...inputProps}
+    <YStack gap="$1.5">
+      <Label fontSize={14} fontWeight="600" color="$appText">
+        {label}
+      </Label>
+      <Input
+        borderWidth={1.5}
+        borderColor={error ? '$error' : '$appBorder'}
+        rounded={10}
+        px="$3.5"
+        py="$3"
+        fontSize={16}
+        color="$appText"
+        bg="$surface"
+        placeholderTextColor={"#757575" as any}
+        focusStyle={{ borderColor: '$primary' }}
+        value={inputProps.value}
+        onChangeText={inputProps.onChangeText}
+        onBlur={inputProps.onBlur as any}
+        placeholder={inputProps.placeholder}
+        keyboardType={inputProps.keyboardType}
+        autoCapitalize={inputProps.autoCapitalize}
+        autoCorrect={inputProps.autoCorrect}
+        returnKeyType={inputProps.returnKeyType}
+        secureTextEntry={inputProps.secureTextEntry}
+        maxLength={inputProps.maxLength}
       />
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-    </View>
+      {error ? (
+        <Text fontSize={12} color="$error" mt="$0.5">
+          {error}
+        </Text>
+      ) : null}
+    </YStack>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    gap: 6,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.text,
-  },
-  input: {
-    borderWidth: 1.5,
-    borderColor: Colors.border,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: Colors.text,
-    backgroundColor: Colors.surface,
-  },
-  inputError: {
-    borderColor: Colors.error,
-  },
-  error: {
-    fontSize: 12,
-    color: Colors.error,
-    marginTop: 2,
-  },
-});

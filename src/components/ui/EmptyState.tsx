@@ -1,6 +1,6 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { Colors } from '../../constants/colors';
+import { StyleSheet, Text as RNText } from 'react-native';
+import { Text, YStack } from 'tamagui';
 
 interface EmptyStateProps {
   message?: string;
@@ -10,27 +10,17 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   message = 'No hay datos disponibles',
 }) => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.emoji}>📭</Text>
-      <Text style={styles.message}>{message}</Text>
-    </View>
+    <YStack flex={1} items="center" justify="center" p="$6" gap="$3">
+      <RNText style={styles.emoji}>📭</RNText>
+      <Text fontSize={16} color="$textSecondary" text="center">
+        {message}
+      </Text>
+    </YStack>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
-    gap: 12,
-  },
   emoji: {
     fontSize: 48,
-  },
-  message: {
-    fontSize: 16,
-    color: Colors.textSecondary,
-    textAlign: 'center',
   },
 });

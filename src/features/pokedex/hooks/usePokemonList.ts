@@ -1,4 +1,5 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
 import { fetchPokemonList } from '../../../services/pokeApi';
 import { getPokemonIdFromUrl } from '../../../utils/pokemonHelpers';
 import { POKEMON_LIST_LIMIT } from '../../../constants/api';
@@ -15,13 +16,16 @@ export function usePokemonList() {
     },
   });
 
-  const pokemonList: PokemonWithId[] =
-    query.data?.pages.flatMap((page) =>
-      page.results.map((p) => ({
-        ...p,
-        id: getPokemonIdFromUrl(p.url),
-      }))
-    ) ?? [];
+  const pokemonList: PokemonWithId[] = useMemo(
+    () =>
+      query.data?.pages.flatMap((page) =>
+        page.results.map((p) => ({
+          ...p,
+          id: getPokemonIdFromUrl(p.url),
+        }))
+      ) ?? [],
+    [query.data]
+  );
 
   return {
     pokemonList,

@@ -1,6 +1,35 @@
 import React from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
-import { Colors } from '../../constants/colors';
+import { ActivityIndicator } from 'react-native';
+import { Button as TamaguiButton, styled } from 'tamagui';
+
+const BaseButton = styled(TamaguiButton, {
+  height: 50,
+  rounded: 12,
+  px: '$5',
+  fontWeight: '600',
+  fontSize: 16,
+  pressStyle: { opacity: 0.8 },
+  disabledStyle: { opacity: 0.5 },
+
+  variants: {
+    variant: {
+      primary: {
+        bg: '$primary',
+        color: '$textLight',
+      },
+      secondary: {
+        bg: '$secondary',
+        color: '$textLight',
+      },
+      outline: {
+        bg: 'transparent',
+        borderWidth: 2,
+        borderColor: '$primary',
+        color: '$primary',
+      },
+    },
+  } as const,
+});
 
 interface ButtonProps {
   label: string;
@@ -17,65 +46,14 @@ export const Button: React.FC<ButtonProps> = ({
   loading = false,
   disabled = false,
 }) => {
-  const isDisabled = disabled || loading;
-
   return (
-    <Pressable
+    <BaseButton
       onPress={onPress}
-      disabled={isDisabled}
-      style={({ pressed }) => [
-        styles.base,
-        styles[variant],
-        pressed && styles.pressed,
-        isDisabled && styles.disabled,
-      ]}
+      disabled={disabled || loading}
+      variant={variant}
+      icon={loading ? <ActivityIndicator color={variant === 'outline' ? '#E3350D' : '#FFFFFF'} /> : undefined}
     >
-      {loading ? (
-        <ActivityIndicator color={variant === 'outline' ? Colors.primary : Colors.textLight} />
-      ) : (
-        <Text style={[styles.label, styles[`${variant}Label`]]}>{label}</Text>
-      )}
-    </Pressable>
+      {loading ? null : label}
+    </BaseButton>
   );
 };
-
-const styles = StyleSheet.create({
-  base: {
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 50,
-  },
-  primary: {
-    backgroundColor: Colors.primary,
-  },
-  secondary: {
-    backgroundColor: Colors.secondary,
-  },
-  outline: {
-    backgroundColor: 'transparent',
-    borderWidth: 2,
-    borderColor: Colors.primary,
-  },
-  pressed: {
-    opacity: 0.8,
-  },
-  disabled: {
-    opacity: 0.5,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  primaryLabel: {
-    color: Colors.textLight,
-  },
-  secondaryLabel: {
-    color: Colors.textLight,
-  },
-  outlineLabel: {
-    color: Colors.primary,
-  },
-});

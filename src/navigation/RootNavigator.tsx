@@ -1,6 +1,6 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
-import { Text } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '../constants/colors';
 import { useTrainerStore } from '../store/trainerStore';
@@ -11,11 +11,14 @@ import { RootTabParamList } from './types';
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
 const TabIcon = ({ emoji, focused }: { emoji: string; focused: boolean }) => (
-  <Text style={{ fontSize: focused ? 26 : 22, opacity: focused ? 1 : 0.6 }}>{emoji}</Text>
+  <Text style={[styles.tabIcon, focused ? styles.tabIconFocused : styles.tabIconUnfocused]}>
+    {emoji}
+  </Text>
 );
 
 export const RootNavigator: React.FC = () => {
   const insets = useSafeAreaInsets();
+  const paddingBottom = insets.bottom > 0 ? insets.bottom : 8;
 
   return (
     <Tab.Navigator
@@ -27,14 +30,10 @@ export const RootNavigator: React.FC = () => {
           backgroundColor: Colors.tabBar,
           borderTopWidth: 1,
           borderTopColor: Colors.border,
-          paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
-          height: 60 + (insets.bottom > 0 ? insets.bottom : 8),
+          paddingBottom,
+          height: 60 + paddingBottom,
         },
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '600',
-          marginBottom: 4,
-        },
+        tabBarLabelStyle: styles.tabLabel,
       }}
     >
       <Tab.Screen
@@ -52,14 +51,31 @@ export const RootNavigator: React.FC = () => {
           tabBarLabel: 'Entrenador',
           tabBarIcon: ({ focused }) => <TabIcon emoji="🎒" focused={focused} />,
         }}
-        listeners={({ navigation }) => ({
-          tabPress: (e) => {
-            e.preventDefault();
+        listeners={() => ({
+          tabPress: () => {
             useTrainerStore.getState().startCreate();
-            navigation.navigate('Trainer', { screen: 'Step1PersonalData' });
           },
         })}
       />
     </Tab.Navigator>
   );
 };
+
+const styles = StyleSheet.create({
+  tabIcon: {
+    opacity: 1,
+  },
+  tabIconFocused: {
+    fontSize: 26,
+    opacity: 1,
+  },
+  tabIconUnfocused: {
+    fontSize: 22,
+    opacity: 0.6,
+  },
+  tabLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+});
