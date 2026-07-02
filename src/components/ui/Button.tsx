@@ -51,7 +51,7 @@ export const Button: React.FC<ButtonProps> = ({
       onPress={onPress}
       disabled={disabled || loading}
       variant={variant}
-      icon={loading ? <ActivityIndicator color={variant === 'outline' ? '#E3350D' : '#FFFFFF'} /> : undefined}
+      icon={loading ? <ActivityIndicator testID="loading-indicator" color={variant === 'outline' ? '#E3350D' : '#FFFFFF'} /> : undefined}
     >
       {loading ? null : label}
     </BaseButton>

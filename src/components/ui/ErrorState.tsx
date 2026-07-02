@@ -15,7 +15,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
   return (
     <YStack flex={1} items="center" justify="center" p="$6" gap="$4">
       <RNText style={styles.emoji}>⚠️</RNText>
-      <Text fontSize={16} color="$error" text="center">
+      <Text fontSize={16} color="$error" style={{ textAlign: 'center' }}>
         {message}
       </Text>
       {onRetry && <Button label="Reintentar" onPress={onRetry} />}

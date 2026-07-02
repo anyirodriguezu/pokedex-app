@@ -4,6 +4,7 @@ import { createTamagui } from 'tamagui';
 const customTokens = {
   primary: '#E3350D',
   primaryDark: '#B02A0A',
+  primarySubtle: '#FFF0EE',
   secondary: '#30A7D7',
   appBackground: '#F5F5F5',
   surface: '#FFFFFF',

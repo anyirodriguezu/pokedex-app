@@ -17,7 +17,7 @@ const InfoRow: React.FC<{ label: string; value: string }> = ({ label, value }) =
       color="$appText"
       fontWeight="600"
       shrink={1}
-      text="right"
+      style={{ textAlign: 'right' }}
       ml="$2"
     >
       {value}

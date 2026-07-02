@@ -23,7 +23,7 @@ export const PokemonStats: React.FC<PokemonStatsProps> = ({ stats }) => {
             <Text width={80} fontSize={13} color="$textSecondary" fontWeight="500">
               {formatStatName(stat.stat.name)}
             </Text>
-            <Text width={36} fontSize={13} fontWeight="700" color="$appText" text="right">
+            <Text width={36} fontSize={13} fontWeight="700" color="$appText" style={{ textAlign: 'right' }}>
               {stat.base_stat}
             </Text>
             <View style={styles.barTrack}>

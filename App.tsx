@@ -4,7 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { TamaguiProvider } from 'tamagui';
-import tamaguiConfig from './tamagui.config';
+import { tamaguiConfig } from './tamagui.config';
 import { RootNavigator } from './src/navigation/RootNavigator';
 
 const queryClient = new QueryClient({

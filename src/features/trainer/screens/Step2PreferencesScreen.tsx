@@ -3,7 +3,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Pressable, ScrollView, StyleSheet, Text as RNText } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 import { Button } from '../../../components/ui/Button';
 import { TrainerStackParamList } from '../../../navigation/types';
 import { useTrainerStore } from '../../../store/trainerStore';
@@ -82,15 +82,25 @@ export const Step2PreferencesScreen: React.FC<Props> = ({ navigation }) => {
                 {DISTRICTS.map((district) => {
                   const selected = value === district;
                   return (
-                    <Pressable
+                    <YStack
                       key={district}
+                      px="$4"
+                      py="$2.5"
+                      rounded={10}
+                      borderWidth={1.5}
+                      borderColor={selected ? '$primary' : '$appBorder'}
+                      bg={selected ? '$primary' : '$surface'}
+                      pressStyle={{ opacity: 0.8 }}
                       onPress={() => onChange(district)}
-                      style={[styles.chip, selected ? styles.chipSelected : styles.chipUnselected]}
                     >
-                      <RNText style={[styles.chipText, selected ? styles.chipTextSelected : styles.chipTextUnselected]}>
+                      <Text
+                        fontSize={14}
+                        fontWeight="600"
+                        color={selected ? '$textLight' : '$appText'}
+                      >
                         {district}
-                      </RNText>
-                    </Pressable>
+                      </Text>
+                    </YStack>
                   );
                 })}
               </XStack>
@@ -115,16 +125,28 @@ export const Step2PreferencesScreen: React.FC<Props> = ({ navigation }) => {
                 {POKEMON_TYPES.map((type) => {
                   const selected = value === type;
                   return (
-                    <Pressable
+                    <YStack
                       key={type}
+                      flex={1}
+                      items="center"
+                      py="$4"
+                      rounded={12}
+                      gap="$1.5"
+                      borderWidth={1.5}
+                      borderColor={selected ? '$primary' : '$appBorder'}
+                      bg={selected ? '$primarySubtle' : '$surface'}
+                      pressStyle={{ opacity: 0.8 }}
                       onPress={() => onChange(type)}
-                      style={[styles.typeButton, selected ? styles.typeButtonSelected : styles.typeButtonUnselected]}
                     >
-                      <RNText style={styles.typeEmoji}>{TYPE_EMOJI[type]}</RNText>
-                      <RNText style={[styles.typeText, selected ? styles.typeTextSelected : styles.typeTextUnselected]}>
+                      <Text fontSize={28}>{TYPE_EMOJI[type]}</Text>
+                      <Text
+                        fontSize={13}
+                        fontWeight="600"
+                        color={selected ? '$primary' : '$textSecondary'}
+                      >
                         {type}
-                      </RNText>
-                    </Pressable>
+                      </Text>
+                    </YStack>
                   );
                 })}
               </XStack>
@@ -158,58 +180,5 @@ const styles = StyleSheet.create({
   content: {
     padding: 20,
     paddingBottom: 40,
-  },
-  chip: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 10,
-    borderWidth: 1.5,
-  },
-  chipSelected: {
-    borderColor: '#E3350D',
-    backgroundColor: '#E3350D',
-  },
-  chipUnselected: {
-    borderColor: '#E0E0E0',
-    backgroundColor: '#FFFFFF',
-  },
-  chipText: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  chipTextSelected: {
-    color: '#FFFFFF',
-  },
-  chipTextUnselected: {
-    color: '#212121',
-  },
-  typeButton: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 16,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    gap: 6,
-  },
-  typeButtonSelected: {
-    borderColor: '#E3350D',
-    backgroundColor: '#FFF0EE',
-  },
-  typeButtonUnselected: {
-    borderColor: '#E0E0E0',
-    backgroundColor: '#FFFFFF',
-  },
-  typeEmoji: {
-    fontSize: 28,
-  },
-  typeText: {
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  typeTextSelected: {
-    color: '#E3350D',
-  },
-  typeTextUnselected: {
-    color: '#757575',
   },
 });

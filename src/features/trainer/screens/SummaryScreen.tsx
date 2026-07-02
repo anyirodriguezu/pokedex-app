@@ -5,7 +5,7 @@ import { Button } from '../../../components/ui/Button';
 import { TrainerStackParamList } from '../../../navigation/types';
 import { useTrainerStore } from '../../../store/trainerStore';
 import { TrainerCard } from '../components/TrainerCard';
-import { Text, YStack } from 'tamagui';
+import { Text } from 'tamagui';
 
 type Props = NativeStackScreenProps<TrainerStackParamList, 'Summary'>;
 
@@ -32,10 +32,10 @@ export const SummaryScreen: React.FC<Props> = ({ navigation }) => {
       style={styles.container}
       contentContainerStyle={styles.content}
     >
-      <Text fontSize={26} fontWeight="800" color="$appText" text="center">
+      <Text fontSize={26} fontWeight="800" color="$appText" style={{ textAlign: 'center' }}>
         ¡Registro completado! 🎉
       </Text>
-      <Text fontSize={15} color="$textSecondary" text="center" mt="$-2">
+      <Text fontSize={15} color="$textSecondary" style={{ textAlign: 'center' }} mt="$-2">
         Tu tarjeta de entrenador está lista
       </Text>
 
