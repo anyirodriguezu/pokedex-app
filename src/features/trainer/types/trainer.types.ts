@@ -1,6 +1,9 @@
 export type District = 'Ate' | 'Breña' | 'Miraflores' | 'Kanto' | 'Johto';
 export type PokemonType = 'Fuego' | 'Agua' | 'Planta';
 
+export const DISTRICTS: District[] = ['Ate', 'Breña', 'Miraflores', 'Kanto', 'Johto'];
+export const POKEMON_TYPES: PokemonType[] = ['Fuego', 'Agua', 'Planta'];
+
 export interface Step1Data {
   fullName: string;
   age: number;

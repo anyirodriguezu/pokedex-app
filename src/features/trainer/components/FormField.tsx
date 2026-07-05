@@ -1,13 +1,39 @@
-import React from 'react';
+﻿import React from 'react';
 import { TextInputProps } from 'react-native';
 import { Input, Label, Text, YStack } from 'tamagui';
+import { Colors } from '../../../constants/colors';
 
-interface FormFieldProps extends TextInputProps {
+interface FormFieldProps {
   label: string;
   error?: string;
+  value?: string;
+  onChangeText?: (text: string) => void;
+  onBlur?: () => void;
+  onFocus?: () => void;
+  placeholder?: string;
+  keyboardType?: TextInputProps['keyboardType'];
+  autoCapitalize?: TextInputProps['autoCapitalize'];
+  autoCorrect?: boolean;
+  returnKeyType?: TextInputProps['returnKeyType'];
+  secureTextEntry?: boolean;
+  maxLength?: number;
 }
 
-export const FormField: React.FC<FormFieldProps> = ({ label, error, ...inputProps }) => {
+export const FormField: React.FC<FormFieldProps> = ({
+  label,
+  error,
+  value,
+  onChangeText,
+  onBlur,
+  onFocus,
+  placeholder,
+  keyboardType,
+  autoCapitalize,
+  autoCorrect,
+  returnKeyType,
+  secureTextEntry,
+  maxLength,
+}) => {
   return (
     <YStack gap="$1.5">
       <Label fontSize={14} fontWeight="600" color="$appText">
@@ -22,21 +48,30 @@ export const FormField: React.FC<FormFieldProps> = ({ label, error, ...inputProp
         fontSize={16}
         color="$appText"
         bg="$surface"
-        placeholderTextColor={"#757575" as any}
+        placeholderTextColor={Colors.textSecondary}
         focusStyle={{ borderColor: '$primary' }}
-        value={inputProps.value}
-        onChangeText={inputProps.onChangeText}
-        onBlur={inputProps.onBlur as any}
-        placeholder={inputProps.placeholder}
-        keyboardType={inputProps.keyboardType}
-        autoCapitalize={inputProps.autoCapitalize}
-        autoCorrect={inputProps.autoCorrect}
-        returnKeyType={inputProps.returnKeyType}
-        secureTextEntry={inputProps.secureTextEntry}
-        maxLength={inputProps.maxLength}
+        value={value}
+        onChangeText={onChangeText}
+        onBlur={onBlur}
+        onFocus={onFocus}
+        placeholder={placeholder}
+        keyboardType={keyboardType}
+        autoCapitalize={autoCapitalize}
+        autoCorrect={autoCorrect}
+        returnKeyType={returnKeyType}
+        secureTextEntry={secureTextEntry}
+        maxLength={maxLength}
+        accessibilityLabel={label}
+        accessibilityHint={error ?? undefined}
       />
       {error ? (
-        <Text fontSize={12} color="$error" mt="$0.5">
+        <Text
+          fontSize={12}
+          color="$error"
+          mt="$0.5"
+          accessibilityLiveRegion="polite"
+          accessibilityRole="alert"
+        >
           {error}
         </Text>
       ) : null}

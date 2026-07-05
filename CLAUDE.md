@@ -88,31 +88,59 @@ Primitivos correctos:
 - Nunca reinventar con `useEffect` + `useState` lo que React Query ya provee
 - Usar `useInfiniteQuery` para paginación (no `useQuery` con offset manual)
 - Los hooks exponen solo lo que las pantallas necesitan — no el objeto query completo
+- `QueryClient` se instancia fuera del componente raíz (singleton), nunca dentro
+- `staleTime: 5 minutos` configurado globalmente en `App.tsx`
 
 ### Formularios (react-hook-form + Yup)
 - Usar `Controller` de react-hook-form para conectar con `TextInput` nativos
 - No usar `register` directamente (es para inputs HTML)
-- Resolver: `yupResolver(schema)` en `useForm`
+- Resolver: `yupResolver(schema)` en `useForm` — sin casts adicionales si el schema está bien tipado
 - Los errores de validación deben mostrarse inline y bloquear el avance al siguiente paso
-- Envolver formularios con `KeyboardAvoidingView` para que el teclado no tape los inputs
+- Envolver formularios con `KeyboardAvoidingView` solo cuando haya `TextInput` — no es necesario en pantallas con selectores/chips
+- **Patrón `yup.mixed<T>()`**: siempre encadenar `.defined()` para que TypeScript infiera `T` en lugar de `T | undefined` y el resolver no requiera casts:
+
+  ```ts
+  // Correcto
+  yup.mixed<District>().oneOf(DISTRICTS, '...').required('...').defined()
+
+  // Incorrecto — obliga a `as unknown as Resolver<>` en useForm
+  yup.mixed<District>().oneOf(DISTRICTS, '...').required('...')
+  ```
 
 ### Zustand
 - El store en `src/store/trainerStore.ts` es la única fuente de verdad del perfil
 - `SummaryScreen` lee desde el store — nunca desde parámetros de navegación
 - Las acciones del store están tipadas en `TrainerStoreState`
+- `persist` con `partialize` limita la persistencia solo a `profile` — los datos transitorios del wizard (`step1Data`, `isEditing`) no se persisten
+- Usar `useTrainerStore.getState()` fuera de componentes React (ej. listeners de navegación)
 
 ### Navegación
 - Los tipos de todas las rutas están en `src/navigation/types.ts`
 - Parámetros entre pantallas siempre tipados con `NativeStackScreenProps<ParamList, 'NombrePantalla'>`
+- Tabs anidados tipados con `NavigatorScreenParams<StackParamList>` en `RootTabParamList`
 - `NavigationContainer` y `QueryClientProvider` viven en `App.tsx`
+
+### Tamagui
+- Configuración en `tamagui.config.ts`: extiende `@tamagui/config/v4`, tokens custom en tema `light`
+- Usar `declare module 'tamagui'` para augmentar el tipo `CustomTokens` — habilita autocompletado de tokens propios (`$primary`, `$surface`, etc.)
+- Para colores que no son tokens (ej. hex dinámicos), usar `style={{ backgroundColor: hex }}` en lugar de `bg={hex as any}`
+- En tests: Tamagui requiere mock manual en `src/__mocks__/tamagui.tsx` y `src/__mocks__/@tamagui/config.ts`; el `render` de tests debe envolverse en `TamaguiProvider` (ver `src/test-utils.tsx`)
 
 ## TypeScript
 
-- Sin `any` — todo tipado explícito
+- Sin `any` — todo tipado explícito. Las únicas excepciones aceptadas son fricciones documentadas del ecosistema
 - Componentes con `React.FC<Props>` o tipo de props explícito
 - Tipos de API en `features/pokedex/types/pokemon.types.ts`
 - Tipos del entrenador en `features/trainer/types/trainer.types.ts`
+- Tipos de formularios via `yup.InferType<typeof schema>` — la fuente de verdad es el schema
 - `npx tsc --noEmit` debe pasar limpio antes de considerar algo terminado
+
+## Tests
+
+- Stack: `jest-expo` + `@testing-library/react-native`
+- Render helper con contexto: `import { render } from '../../../test-utils'` (no desde `@testing-library/react-native` directamente)
+- Ejecutar: `npm test` / `npm run test:coverage`
+- Cobertura apuntada a: schemas, store, utils y componentes UI aislados
 
 ## Commits
 

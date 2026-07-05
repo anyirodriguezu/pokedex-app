@@ -8,7 +8,7 @@ import { PokemonWithId } from '../types/pokemon.types';
 export function usePokemonList() {
   const query = useInfiniteQuery({
     queryKey: ['pokemonList'],
-    queryFn: ({ pageParam = 0 }) => fetchPokemonList(pageParam as number),
+    queryFn: ({ pageParam }) => fetchPokemonList(pageParam as number),
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
       if (!lastPage.next) return undefined;

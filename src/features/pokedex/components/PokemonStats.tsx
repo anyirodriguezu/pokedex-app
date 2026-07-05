@@ -1,6 +1,7 @@
-import React from 'react';
+﻿import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Card, Text, XStack } from 'tamagui';
+import { Colors } from '../../../constants/colors';
 import { formatStatName } from '../../../utils/pokemonHelpers';
 import { PokemonStat } from '../types/pokemon.types';
 
@@ -19,15 +20,26 @@ export const PokemonStats: React.FC<PokemonStatsProps> = ({ stats }) => {
       {stats.map((stat) => {
         const percentage = (stat.base_stat / MAX_STAT) * 100;
         return (
-          <XStack key={stat.stat.name} items="center" gap="$2">
+          <XStack
+            key={stat.stat.name}
+            items="center"
+            gap="$2"
+            accessibilityLabel={formatStatName(stat.stat.name) + ': ' + stat.base_stat}
+          >
             <Text width={80} fontSize={13} color="$textSecondary" fontWeight="500">
               {formatStatName(stat.stat.name)}
             </Text>
-            <Text width={36} fontSize={13} fontWeight="700" color="$appText" style={{ textAlign: 'right' }}>
+            <Text
+              width={36}
+              fontSize={13}
+              fontWeight="700"
+              color="$appText"
+              style={{ textAlign: 'right' }}
+            >
               {stat.base_stat}
             </Text>
-            <View style={styles.barTrack}>
-              <View style={[styles.barFill, { width: `${percentage}%` }]} />
+            <View style={styles.barTrack} accessibilityRole="progressbar">
+              <View style={[styles.barFill, { width: percentage + '%' }]} />
             </View>
           </XStack>
         );
@@ -40,13 +52,13 @@ const styles = StyleSheet.create({
   barTrack: {
     flex: 1,
     height: 8,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: Colors.border,
     borderRadius: 4,
     overflow: 'hidden',
   },
   barFill: {
     height: '100%',
-    backgroundColor: '#E3350D',
+    backgroundColor: Colors.primary,
     borderRadius: 4,
   },
 });

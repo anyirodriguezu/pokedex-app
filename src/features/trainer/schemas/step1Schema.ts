@@ -7,6 +7,9 @@ export const step1Schema = yup.object({
     .required('El nombre es requerido'),
   age: yup
     .number()
+    .transform((value, originalValue) =>
+      originalValue === '' || originalValue === null ? undefined : value
+    )
     .typeError('La edad debe ser un número')
     .min(10, 'Debes tener al menos 10 años')
     .required('La edad es requerida'),

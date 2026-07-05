@@ -1,7 +1,9 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+﻿import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useCallback } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet } from 'react-native';
+import { EmptyState } from '../../../components/ui/EmptyState';
 import { ErrorState } from '../../../components/ui/ErrorState';
+import { Colors } from '../../../constants/colors';
 import { PokedexStackParamList } from '../../../navigation/types';
 import { PokemonCard } from '../components/PokemonCard';
 import { LoadingState } from '../components/LoadingState';
@@ -12,16 +14,29 @@ import { YStack } from 'tamagui';
 type Props = NativeStackScreenProps<PokedexStackParamList, 'PokemonList'>;
 
 export const PokemonListScreen: React.FC<Props> = ({ navigation }) => {
-  const { pokemonList, isLoading, isError, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    usePokemonList();
+  const {
+    pokemonList,
+    isLoading,
+    isError,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = usePokemonList();
 
-  const handlePress = useCallback((id: number, name: string) => {
-    navigation.navigate('PokemonDetail', { pokemonId: id, pokemonName: name });
-  }, [navigation]);
+  const handlePress = useCallback(
+    (id: number, name: string) => {
+      navigation.navigate('PokemonDetail', { pokemonId: id, pokemonName: name });
+    },
+    [navigation]
+  );
 
-  const renderItem = useCallback(({ item }: { item: PokemonWithId }) => (
-    <PokemonCard pokemon={item} onPress={handlePress} />
-  ), [handlePress]);
+  const renderItem = useCallback(
+    ({ item }: { item: PokemonWithId }) => (
+      <PokemonCard pokemon={item} onPress={handlePress} />
+    ),
+    [handlePress]
+  );
 
   if (isLoading) {
     return <LoadingState message="Cargando Pokémon..." />;
@@ -51,11 +66,13 @@ export const PokemonListScreen: React.FC<Props> = ({ navigation }) => {
           if (hasNextPage && !isFetchingNextPage) fetchNextPage();
         }}
         onEndReachedThreshold={0.5}
+        ListEmptyComponent={<EmptyState message="No se encontraron Pokémon" />}
         ListFooterComponent={
           isFetchingNextPage ? (
-            <ActivityIndicator style={styles.footer} color="#E3350D" />
+            <ActivityIndicator style={styles.footer} color={Colors.primary} />
           ) : null
         }
+        accessibilityLabel="Lista de Pokémon"
       />
     </YStack>
   );

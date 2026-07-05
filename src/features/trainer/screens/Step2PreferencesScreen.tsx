@@ -1,22 +1,20 @@
-import { yupResolver } from '@hookform/resolvers/yup';
+﻿import { yupResolver } from '@hookform/resolvers/yup';
 import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { ScrollView, StyleSheet } from 'react-native';
 import { Button } from '../../../components/ui/Button';
+import { Colors } from '../../../constants/colors';
 import { TrainerStackParamList } from '../../../navigation/types';
 import { useTrainerStore } from '../../../store/trainerStore';
 import { StepIndicator } from '../components/StepIndicator';
 import { TYPE_EMOJI } from '../constants/typeEmoji';
 import { step2Schema, Step2FormValues } from '../schemas/step2Schema';
-import { District, PokemonType } from '../types/trainer.types';
+import { DISTRICTS, POKEMON_TYPES } from '../types/trainer.types';
 import { Text, XStack, YStack } from 'tamagui';
 
 type Props = NativeStackScreenProps<TrainerStackParamList, 'Step2Preferences'>;
-
-const DISTRICTS: District[] = ['Ate', 'Breña', 'Miraflores', 'Kanto', 'Johto'];
-const POKEMON_TYPES: PokemonType[] = ['Fuego', 'Agua', 'Planta'];
 
 export const Step2PreferencesScreen: React.FC<Props> = ({ navigation }) => {
   const { setStep2Data, profile, isEditing } = useTrainerStore();
@@ -48,7 +46,8 @@ export const Step2PreferencesScreen: React.FC<Props> = ({ navigation }) => {
   );
 
   const onSubmit = (data: Step2FormValues) => {
-    setStep2Data({ district: data.district!, favoritePokemonType: data.favoritePokemonType! });
+    if (!data.district || !data.favoritePokemonType) return;
+    setStep2Data({ district: data.district, favoritePokemonType: data.favoritePokemonType });
     navigation.navigate('Summary');
   };
 
@@ -92,6 +91,9 @@ export const Step2PreferencesScreen: React.FC<Props> = ({ navigation }) => {
                       bg={selected ? '$primary' : '$surface'}
                       pressStyle={{ opacity: 0.8 }}
                       onPress={() => onChange(district)}
+                      accessibilityRole="button"
+                      accessibilityLabel={'Distrito ' + district}
+                      accessibilityState={{ selected }}
                     >
                       <Text
                         fontSize={14}
@@ -107,7 +109,7 @@ export const Step2PreferencesScreen: React.FC<Props> = ({ navigation }) => {
             )}
           />
           {errors.district && (
-            <Text fontSize={12} color="$error">
+            <Text fontSize={12} color="$error" accessibilityRole="alert">
               {errors.district.message}
             </Text>
           )}
@@ -137,6 +139,9 @@ export const Step2PreferencesScreen: React.FC<Props> = ({ navigation }) => {
                       bg={selected ? '$primarySubtle' : '$surface'}
                       pressStyle={{ opacity: 0.8 }}
                       onPress={() => onChange(type)}
+                      accessibilityRole="button"
+                      accessibilityLabel={'Tipo ' + type}
+                      accessibilityState={{ selected }}
                     >
                       <Text fontSize={28}>{TYPE_EMOJI[type]}</Text>
                       <Text
@@ -153,7 +158,7 @@ export const Step2PreferencesScreen: React.FC<Props> = ({ navigation }) => {
             )}
           />
           {errors.favoritePokemonType && (
-            <Text fontSize={12} color="$error">
+            <Text fontSize={12} color="$error" accessibilityRole="alert">
               {errors.favoritePokemonType.message}
             </Text>
           )}
@@ -175,7 +180,7 @@ export const Step2PreferencesScreen: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: Colors.background,
   },
   content: {
     padding: 20,

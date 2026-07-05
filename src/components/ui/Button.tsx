@@ -1,6 +1,7 @@
-import React from 'react';
+﻿import React from 'react';
 import { ActivityIndicator } from 'react-native';
 import { Button as TamaguiButton, styled } from 'tamagui';
+import { Colors } from '../../constants/colors';
 
 const BaseButton = styled(TamaguiButton, {
   height: 50,
@@ -51,7 +52,10 @@ export const Button: React.FC<ButtonProps> = ({
       onPress={onPress}
       disabled={disabled || loading}
       variant={variant}
-      icon={loading ? <ActivityIndicator testID="loading-indicator" color={variant === 'outline' ? '#E3350D' : '#FFFFFF'} /> : undefined}
+      accessibilityRole="button"
+      accessibilityLabel={loading ? 'Cargando' : label}
+      accessibilityState={{ disabled: disabled || loading, busy: loading }}
+      icon={loading ? <ActivityIndicator testID="loading-indicator" color={variant === 'outline' ? Colors.primary : Colors.textLight} /> : undefined}
     >
       {loading ? null : label}
     </BaseButton>

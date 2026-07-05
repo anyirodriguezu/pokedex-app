@@ -1,4 +1,4 @@
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+﻿import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,8 +10,18 @@ import { RootTabParamList } from './types';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
-const TabIcon = ({ emoji, focused }: { emoji: string; focused: boolean }) => (
-  <Text style={[styles.tabIcon, focused ? styles.tabIconFocused : styles.tabIconUnfocused]}>
+interface TabIconProps {
+  emoji: string;
+  focused: boolean;
+  accessibilityLabel: string;
+}
+
+const TabIcon: React.FC<TabIconProps> = ({ emoji, focused, accessibilityLabel }) => (
+  <Text
+    style={[styles.tabIcon, focused ? styles.tabIconFocused : styles.tabIconUnfocused]}
+    accessibilityLabel={accessibilityLabel}
+    accessibilityRole="image"
+  >
     {emoji}
   </Text>
 );
@@ -41,7 +51,9 @@ export const RootNavigator: React.FC = () => {
         component={PokedexStack}
         options={{
           tabBarLabel: 'Pokédex',
-          tabBarIcon: ({ focused }) => <TabIcon emoji="📖" focused={focused} />,
+          tabBarIcon: ({ focused }) => (
+            <TabIcon emoji="📖" focused={focused} accessibilityLabel="Pokédex" />
+          ),
         }}
       />
       <Tab.Screen
@@ -49,11 +61,16 @@ export const RootNavigator: React.FC = () => {
         component={TrainerStack}
         options={{
           tabBarLabel: 'Entrenador',
-          tabBarIcon: ({ focused }) => <TabIcon emoji="🎒" focused={focused} />,
+          tabBarIcon: ({ focused }) => (
+            <TabIcon emoji="🎒" focused={focused} accessibilityLabel="Entrenador" />
+          ),
         }}
         listeners={() => ({
           tabPress: () => {
-            useTrainerStore.getState().startCreate();
+            const { step1Data, isEditing } = useTrainerStore.getState();
+            if (!step1Data && !isEditing) {
+              useTrainerStore.getState().startCreate();
+            }
           },
         })}
       />
@@ -62,20 +79,8 @@ export const RootNavigator: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  tabIcon: {
-    opacity: 1,
-  },
-  tabIconFocused: {
-    fontSize: 26,
-    opacity: 1,
-  },
-  tabIconUnfocused: {
-    fontSize: 22,
-    opacity: 0.6,
-  },
-  tabLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
+  tabIcon: { opacity: 1 },
+  tabIconFocused: { fontSize: 26, opacity: 1 },
+  tabIconUnfocused: { fontSize: 22, opacity: 0.6 },
+  tabLabel: { fontSize: 12, fontWeight: '600', marginBottom: 4 },
 });

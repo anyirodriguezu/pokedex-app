@@ -1,10 +1,11 @@
-import { yupResolver } from '@hookform/resolvers/yup';
+﻿import { yupResolver } from '@hookform/resolvers/yup';
 import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React from 'react';
+import React, { useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
 import { Button } from '../../../components/ui/Button';
+import { Colors } from '../../../constants/colors';
 import { TrainerStackParamList } from '../../../navigation/types';
 import { useTrainerStore } from '../../../store/trainerStore';
 import { FormField } from '../components/FormField';
@@ -16,6 +17,7 @@ type Props = NativeStackScreenProps<TrainerStackParamList, 'Step1PersonalData'>;
 
 export const Step1PersonalDataScreen: React.FC<Props> = ({ navigation }) => {
   const { setStep1Data, step1Data, isEditing } = useTrainerStore();
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const {
     control,
@@ -26,7 +28,6 @@ export const Step1PersonalDataScreen: React.FC<Props> = ({ navigation }) => {
     resolver: yupResolver(step1Schema),
     defaultValues: {
       fullName: '',
-      age: '' as unknown as number,
       email: '',
     },
   });
@@ -36,11 +37,11 @@ export const Step1PersonalDataScreen: React.FC<Props> = ({ navigation }) => {
       if (isEditing) {
         reset({
           fullName: step1Data?.fullName ?? '',
-          age: step1Data?.age ?? ('' as unknown as number),
+          age: step1Data?.age,
           email: step1Data?.email ?? '',
         });
       } else {
-        reset({ fullName: '', age: '' as unknown as number, email: '' });
+        reset({ fullName: '', age: undefined, email: '' });
       }
     }, [isEditing, step1Data, reset])
   );
@@ -53,12 +54,15 @@ export const Step1PersonalDataScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      enabled={Platform.OS === 'ios'}
     >
       <ScrollView
+        ref={scrollViewRef}
         style={styles.scroll}
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
         <YStack gap="$4">
           <StepIndicator currentStep={1} totalSteps={2} />
@@ -96,9 +100,9 @@ export const Step1PersonalDataScreen: React.FC<Props> = ({ navigation }) => {
                 <FormField
                   label="Edad"
                   placeholder="Ej: 10"
-                  onChangeText={(text) => onChange(text === '' ? '' : Number(text))}
+                  onChangeText={(text) => onChange(text === '' ? undefined : Number(text))}
                   onBlur={onBlur}
-                  value={value !== undefined && value !== null ? String(value) : ''}
+                  value={value != null ? String(value) : ''}
                   error={errors.age?.message}
                   keyboardType="numeric"
                 />
@@ -114,6 +118,9 @@ export const Step1PersonalDataScreen: React.FC<Props> = ({ navigation }) => {
                   placeholder="Ej: ash@pokemon.com"
                   onChangeText={onChange}
                   onBlur={onBlur}
+                  onFocus={() =>
+                    setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 300)
+                  }
                   value={value}
                   error={errors.email?.message}
                   keyboardType="email-address"
@@ -133,13 +140,14 @@ export const Step1PersonalDataScreen: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: Colors.background,
   },
   scroll: {
     flex: 1,
   },
   content: {
     padding: 20,
-    paddingBottom: 40,
+    paddingBottom: 120,
+    flexGrow: 1,
   },
 });

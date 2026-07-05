@@ -1,9 +1,10 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+﻿import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React from 'react';
 import { Image, ScrollView, StyleSheet } from 'react-native';
 import { ErrorState } from '../../../components/ui/ErrorState';
 import { PokedexStackParamList } from '../../../navigation/types';
 import { capitalize, getTypeColor } from '../../../utils/pokemonHelpers';
+import { Colors } from '../../../constants/colors';
 import { Card, Text, XStack, YStack } from 'tamagui';
 import { LoadingState } from '../components/LoadingState';
 import { PokemonStats } from '../components/PokemonStats';
@@ -49,7 +50,7 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route }) => {
               px="$4"
               py="$1.5"
               rounded={20}
-              bg={getTypeColor(t.type.name) as `#${string}`}
+              bg={getTypeColor(t.type.name) as any}
             >
               <Text color="$textLight" fontWeight="600" fontSize={14}>
                 {capitalize(t.type.name)}
@@ -95,7 +96,7 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: Colors.background,
   },
   content: {
     padding: 16,
