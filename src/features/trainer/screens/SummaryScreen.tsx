@@ -1,4 +1,4 @@
-﻿import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useEffect } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 import { Button } from '../../../components/ui/Button';
@@ -11,7 +11,7 @@ import { Text, YStack } from 'tamagui';
 type Props = NativeStackScreenProps<TrainerStackParamList, 'Summary'>;
 
 export const SummaryScreen: React.FC<Props> = ({ navigation }) => {
-  const { profile, isEditing, startEdit, resetProfile } = useTrainerStore();
+  const { profile, isEditing, startEdit, setStep1Data, resetProfile } = useTrainerStore();
 
   useEffect(() => {
     if (!profile && !isEditing) {
@@ -20,8 +20,11 @@ export const SummaryScreen: React.FC<Props> = ({ navigation }) => {
   }, [profile, isEditing, navigation]);
 
   const handleEditProfile = () => {
+    if (!profile) return;
+    // Pre-load step1Data from profile so Step1 screen can prefill correctly
+    setStep1Data({ fullName: profile.fullName, age: profile.age, email: profile.email });
     startEdit();
-    navigation.popToTop();
+    navigation.navigate('Step1PersonalData', { mode: 'edit' });
   };
 
   const handleNewProfile = () => {

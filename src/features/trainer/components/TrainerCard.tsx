@@ -1,4 +1,5 @@
 import React from 'react';
+import { Image, StyleSheet } from 'react-native';
 import { Card, Separator, Text, XStack, YStack } from 'tamagui';
 import { TYPE_EMOJI } from '../constants/typeEmoji';
 import { TrainerProfile } from '../types/trainer.types';
@@ -62,6 +63,35 @@ export const TrainerCard: React.FC<TrainerCardProps> = ({ profile }) => {
           value={`${TYPE_EMOJI[profile.favoritePokemonType] ?? ''} ${profile.favoritePokemonType}`}
         />
       </YStack>
+
+      {profile.starterPokemon && (
+        <>
+          <Separator mt="$2" mb="$3" borderColor="$appBorder" />
+          <XStack items="center" gap="$3" bg="$appBackground" rounded={12} p="$3">
+            <Image
+              source={{ uri: profile.starterPokemon.sprite }}
+              style={styles.starterImage}
+              resizeMode="contain"
+              accessibilityLabel={`Pokémon inicial: ${profile.starterPokemon.name}`}
+            />
+            <YStack>
+              <Text fontSize={12} color="$textSecondary">
+                Pokémon Inicial
+              </Text>
+              <Text fontSize={16} fontWeight="700" color="$appText">
+                {profile.starterPokemon.name}
+              </Text>
+            </YStack>
+          </XStack>
+        </>
+      )}
     </Card>
   );
 };
+
+const styles = StyleSheet.create({
+  starterImage: {
+    width: 56,
+    height: 56,
+  },
+});

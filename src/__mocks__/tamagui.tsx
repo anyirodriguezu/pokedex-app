@@ -1,21 +1,67 @@
 import React from 'react';
-import { View, Text as RNText, TextInput, Pressable } from 'react-native';
+import {
+  View,
+  Text as RNText,
+  TextInput,
+  Pressable,
+  StyleProp,
+  ViewStyle,
+  TextInputProps,
+  GestureResponderEvent,
+} from 'react-native';
 
-export const YStack = ({ children, style, ...props }: any) => (
-  <View style={style}>{children}</View>
-);
-export const XStack = ({ children, style, ...props }: any) => (
-  <View style={style}>{children}</View>
-);
-export const Card = ({ children, style, ...props }: any) => (
-  <View style={style}>{children}</View>
-);
-export const Separator = ({ style, ...props }: any) => <View style={style} />;
+type LayoutProps = {
+  children?: React.ReactNode;
+  style?: StyleProp<ViewStyle>;
+  [key: string]: unknown;
+};
 
-export const Text = ({ children, ...props }: any) => <RNText>{children}</RNText>;
-export const Label = ({ children, ...props }: any) => <RNText>{children}</RNText>;
+type TextProps = {
+  children?: React.ReactNode;
+  [key: string]: unknown;
+};
 
-export const Input = ({ style, value, onChangeText, onBlur, placeholder, keyboardType, autoCapitalize, autoCorrect, returnKeyType, secureTextEntry, maxLength, ...props }: any) => (
+type MockInputProps = TextInputProps & {
+  [key: string]: unknown;
+};
+
+type PressableComponentProps = {
+  children?: React.ReactNode;
+  onPress?: ((event: GestureResponderEvent) => void) | null;
+  disabled?: boolean | null;
+  icon?: React.ReactNode;
+  [key: string]: unknown;
+};
+
+export const YStack = ({ children, style }: LayoutProps) => (
+  <View style={style as StyleProp<ViewStyle>}>{children}</View>
+);
+export const XStack = ({ children, style }: LayoutProps) => (
+  <View style={style as StyleProp<ViewStyle>}>{children}</View>
+);
+export const Card = ({ children, style }: LayoutProps) => (
+  <View style={style as StyleProp<ViewStyle>}>{children}</View>
+);
+export const Separator = ({ style }: { style?: StyleProp<ViewStyle> }) => (
+  <View style={style} />
+);
+
+export const Text = ({ children }: TextProps) => <RNText>{children}</RNText>;
+export const Label = ({ children }: TextProps) => <RNText>{children}</RNText>;
+
+export const Input = ({
+  style,
+  value,
+  onChangeText,
+  onBlur,
+  placeholder,
+  keyboardType,
+  autoCapitalize,
+  autoCorrect,
+  returnKeyType,
+  secureTextEntry,
+  maxLength,
+}: MockInputProps) => (
   <TextInput
     style={style}
     value={value}
@@ -31,15 +77,18 @@ export const Input = ({ style, value, onChangeText, onBlur, placeholder, keyboar
   />
 );
 
-export const Button = ({ children, onPress, disabled, icon, ...props }: any) => (
+export const Button = ({ children, onPress, disabled, icon }: PressableComponentProps) => (
   <Pressable onPress={onPress} disabled={disabled}>
     {icon}
     {children}
   </Pressable>
 );
 
-export const styled = (_Component: any, _config: any) => {
-  function StyledComponent({ children, onPress, disabled, icon, ...props }: any) {
+export const styled = (
+  _Component: React.ComponentType,
+  _config: Record<string, unknown>
+) => {
+  function StyledComponent({ children, onPress, disabled, icon }: PressableComponentProps) {
     return (
       <Pressable onPress={onPress} disabled={disabled}>
         {icon}
@@ -50,5 +99,5 @@ export const styled = (_Component: any, _config: any) => {
   return StyledComponent;
 };
 
-export const TamaguiProvider = ({ children }: any) => <>{children}</>;
-export const createTamagui = (config: any) => config;
+export const TamaguiProvider = ({ children }: React.PropsWithChildren) => <>{children}</>;
+export const createTamagui = (config: Record<string, unknown>) => config;

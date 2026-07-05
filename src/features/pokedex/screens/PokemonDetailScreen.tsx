@@ -1,20 +1,24 @@
-﻿import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React from 'react';
 import { Image, ScrollView, StyleSheet } from 'react-native';
 import { ErrorState } from '../../../components/ui/ErrorState';
 import { PokedexStackParamList } from '../../../navigation/types';
 import { capitalize, getTypeColor } from '../../../utils/pokemonHelpers';
 import { Colors } from '../../../constants/colors';
+import { useTrainerStore } from '../../../store/trainerStore';
 import { Card, Text, XStack, YStack } from 'tamagui';
 import { LoadingState } from '../components/LoadingState';
 import { PokemonStats } from '../components/PokemonStats';
 import { usePokemonDetail } from '../hooks/usePokemonDetail';
+import { Button } from '../../../components/ui/Button';
 
 type Props = NativeStackScreenProps<PokedexStackParamList, 'PokemonDetail'>;
 
 export const PokemonDetailScreen: React.FC<Props> = ({ route }) => {
   const { pokemonId } = route.params;
   const { data, isLoading, isError, refetch } = usePokemonDetail(pokemonId);
+  const { capture, release, captured } = useTrainerStore();
+  const isCaptured = captured.some((c) => c.id === pokemonId);
 
   if (isLoading) {
     return <LoadingState message="Cargando detalle..." />;
@@ -31,11 +35,16 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route }) => {
 
   const imageUrl = data.sprites.other['official-artwork'].front_default;
 
+  const handleCaptureToggle = () => {
+    if (isCaptured) {
+      release(pokemonId);
+    } else if (imageUrl) {
+      capture({ id: data.id, name: capitalize(data.name), sprite: imageUrl });
+    }
+  };
+
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-    >
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <YStack items="center" gap="$2">
         <Text fontSize={16} color="$textSecondary" fontWeight="500">
           #{String(data.id).padStart(3, '0')}
@@ -50,7 +59,7 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route }) => {
               px="$4"
               py="$1.5"
               rounded={20}
-              bg={getTypeColor(t.type.name) as any}
+              style={{ backgroundColor: getTypeColor(t.type.name) }}
             >
               <Text color="$textLight" fontWeight="600" fontSize={14}>
                 {capitalize(t.type.name)}
@@ -69,6 +78,12 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route }) => {
           />
         </Card>
       )}
+
+      <Button
+        label={isCaptured ? '🔓 Liberar' : '🎯 Capturar'}
+        variant={isCaptured ? 'outline' : 'primary'}
+        onPress={handleCaptureToggle}
+      />
 
       <Card bg="$surface" rounded={16} p="$4" elevation={2}>
         <XStack justify="space-around" items="center">

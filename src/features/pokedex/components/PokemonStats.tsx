@@ -1,5 +1,5 @@
-﻿import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Animated, StyleSheet, View } from 'react-native';
 import { Card, Text, XStack } from 'tamagui';
 import { Colors } from '../../../constants/colors';
 import { formatStatName } from '../../../utils/pokemonHelpers';
@@ -11,14 +11,42 @@ interface PokemonStatsProps {
 
 const MAX_STAT = 255;
 
+const STAT_COLORS: Record<string, string> = {
+  hp: '#FF5959',
+  attack: '#F5AC78',
+  defense: '#FAE078',
+  'special-attack': '#9DB7F5',
+  'special-defense': '#A7DB8D',
+  speed: '#FA92B2',
+};
+
 export const PokemonStats: React.FC<PokemonStatsProps> = ({ stats }) => {
+  const animatedValues = useRef(stats.map(() => new Animated.Value(0))).current;
+
+  useEffect(() => {
+    const animations = stats.map((stat, index) => {
+      const percentage = (stat.base_stat / MAX_STAT) * 100;
+      return Animated.timing(animatedValues[index], {
+        toValue: percentage,
+        duration: 700,
+        useNativeDriver: false,
+      });
+    });
+    Animated.stagger(80, animations).start();
+  }, [stats, animatedValues]);
+
   return (
     <Card bg="$surface" rounded={16} p="$4" gap="$2.5">
       <Text fontSize={18} fontWeight="700" color="$appText" mb="$1">
         Estadísticas Base
       </Text>
-      {stats.map((stat) => {
-        const percentage = (stat.base_stat / MAX_STAT) * 100;
+      {stats.map((stat, index) => {
+        const barColor = STAT_COLORS[stat.stat.name] ?? Colors.primary;
+        const animatedWidth = animatedValues[index].interpolate({
+          inputRange: [0, 100],
+          outputRange: ['0%', '100%'],
+        });
+
         return (
           <XStack
             key={stat.stat.name}
@@ -39,7 +67,9 @@ export const PokemonStats: React.FC<PokemonStatsProps> = ({ stats }) => {
               {stat.base_stat}
             </Text>
             <View style={styles.barTrack} accessibilityRole="progressbar">
-              <View style={[styles.barFill, { width: percentage + '%' }]} />
+              <Animated.View
+                style={[styles.barFill, { width: animatedWidth, backgroundColor: barColor }]}
+              />
             </View>
           </XStack>
         );
@@ -58,7 +88,6 @@ const styles = StyleSheet.create({
   },
   barFill: {
     height: '100%',
-    backgroundColor: Colors.primary,
     borderRadius: 4,
   },
 });

@@ -1,4 +1,4 @@
-﻿import { yupResolver } from '@hookform/resolvers/yup';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useRef } from 'react';
@@ -15,7 +15,8 @@ import { Text, YStack } from 'tamagui';
 
 type Props = NativeStackScreenProps<TrainerStackParamList, 'Step1PersonalData'>;
 
-export const Step1PersonalDataScreen: React.FC<Props> = ({ navigation }) => {
+export const Step1PersonalDataScreen: React.FC<Props> = ({ navigation, route }) => {
+  const mode = route.params?.mode ?? 'create';
   const { setStep1Data, step1Data, isEditing } = useTrainerStore();
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -48,7 +49,7 @@ export const Step1PersonalDataScreen: React.FC<Props> = ({ navigation }) => {
 
   const onSubmit = (data: Step1FormValues) => {
     setStep1Data({ fullName: data.fullName, age: data.age, email: data.email });
-    navigation.navigate('Step2Preferences');
+    navigation.navigate('Step2Preferences', { mode });
   };
 
   return (
@@ -65,7 +66,7 @@ export const Step1PersonalDataScreen: React.FC<Props> = ({ navigation }) => {
         showsVerticalScrollIndicator={false}
       >
         <YStack gap="$4">
-          <StepIndicator currentStep={1} totalSteps={2} />
+          <StepIndicator currentStep={1} totalSteps={3} />
 
           <YStack gap="$1">
             <Text fontSize={26} fontWeight="800" color="$appText">

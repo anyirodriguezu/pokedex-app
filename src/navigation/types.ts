@@ -5,13 +5,17 @@ export type PokedexStackParamList = {
   PokemonDetail: { pokemonId: number; pokemonName: string };
 };
 
+export type WizardMode = 'create' | 'edit';
+
 export type TrainerStackParamList = {
-  Step1PersonalData: undefined;
-  Step2Preferences: undefined;
+  Step1PersonalData: { mode?: WizardMode };
+  Step2Preferences: { mode?: WizardMode };
+  StarterPokemon: { mode?: WizardMode };
   Summary: undefined;
 };
 
 export type RootTabParamList = {
   Pokedex: NavigatorScreenParams<PokedexStackParamList>;
   Trainer: NavigatorScreenParams<TrainerStackParamList>;
+  Team: undefined;
 };

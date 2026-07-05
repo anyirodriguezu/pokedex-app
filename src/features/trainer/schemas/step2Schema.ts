@@ -6,12 +6,12 @@ export const step2Schema = yup.object({
     .mixed<District>()
     .oneOf(DISTRICTS, 'Selecciona un distrito válido')
     .required('El distrito es requerido')
-    .defined(),
+    .defined('El distrito es requerido'),
   favoritePokemonType: yup
     .mixed<PokemonType>()
     .oneOf(POKEMON_TYPES, 'Selecciona un tipo válido')
     .required('El tipo favorito es requerido')
-    .defined(),
+    .defined('El tipo favorito es requerido'),
 });
 
 export type Step2FormValues = yup.InferType<typeof step2Schema>;

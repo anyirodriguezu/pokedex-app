@@ -49,3 +49,15 @@ export interface PokemonDetail {
 export interface PokemonWithId extends PokemonListItem {
   id: number;
 }
+
+export interface PokemonTypeEntry {
+  pokemon: {
+    name: string;
+    url: string;
+  };
+  slot: number;
+}
+
+export interface PokemonTypeResponse {
+  pokemon: PokemonTypeEntry[];
+}

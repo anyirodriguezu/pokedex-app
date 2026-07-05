@@ -16,7 +16,8 @@ import { Text, XStack, YStack } from 'tamagui';
 
 type Props = NativeStackScreenProps<TrainerStackParamList, 'Step2Preferences'>;
 
-export const Step2PreferencesScreen: React.FC<Props> = ({ navigation }) => {
+export const Step2PreferencesScreen: React.FC<Props> = ({ navigation, route }) => {
+  const mode = route.params?.mode ?? 'create';
   const { setStep2Data, profile, isEditing } = useTrainerStore();
 
   const {
@@ -48,7 +49,7 @@ export const Step2PreferencesScreen: React.FC<Props> = ({ navigation }) => {
   const onSubmit = (data: Step2FormValues) => {
     if (!data.district || !data.favoritePokemonType) return;
     setStep2Data({ district: data.district, favoritePokemonType: data.favoritePokemonType });
-    navigation.navigate('Summary');
+    navigation.navigate('StarterPokemon', { mode });
   };
 
   return (
@@ -58,7 +59,7 @@ export const Step2PreferencesScreen: React.FC<Props> = ({ navigation }) => {
       keyboardShouldPersistTaps="handled"
     >
       <YStack gap="$5">
-        <StepIndicator currentStep={2} totalSteps={2} />
+        <StepIndicator currentStep={2} totalSteps={3} />
 
         <YStack gap="$1">
           <Text fontSize={26} fontWeight="800" color="$appText">

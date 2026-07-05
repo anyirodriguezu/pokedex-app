@@ -2,6 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 import { Step1PersonalDataScreen } from '../features/trainer/screens/Step1PersonalDataScreen';
 import { Step2PreferencesScreen } from '../features/trainer/screens/Step2PreferencesScreen';
+import { StarterPokemonScreen } from '../features/trainer/screens/StarterPokemonScreen';
 import { SummaryScreen } from '../features/trainer/screens/SummaryScreen';
 import { Colors } from '../constants/colors';
 import { TrainerStackParamList } from './types';
@@ -20,12 +21,18 @@ export const TrainerStack: React.FC = () => {
       <Stack.Screen
         name="Step1PersonalData"
         component={Step1PersonalDataScreen}
-        options={{ title: 'Paso 1 de 2' }}
+        options={{ title: 'Paso 1 de 3' }}
+        initialParams={{ mode: 'create' }}
       />
       <Stack.Screen
         name="Step2Preferences"
         component={Step2PreferencesScreen}
-        options={{ title: 'Paso 2 de 2' }}
+        options={{ title: 'Paso 2 de 3' }}
+      />
+      <Stack.Screen
+        name="StarterPokemon"
+        component={StarterPokemonScreen}
+        options={{ title: 'Paso 3 de 3' }}
       />
       <Stack.Screen
         name="Summary"

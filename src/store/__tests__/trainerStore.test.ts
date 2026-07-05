@@ -5,7 +5,7 @@ const step1Mock: Step1Data = { fullName: 'Ash Ketchum', age: 10, email: 'ash@pok
 const step2Mock: Step2Data = { district: 'Kanto', favoritePokemonType: 'Fuego' };
 
 beforeEach(() => {
-  useTrainerStore.setState({ profile: null, step1Data: null, isEditing: false });
+  useTrainerStore.setState({ profile: null, step1Data: null, isEditing: false, captured: [] });
 });
 
 describe('estado inicial', () => {
@@ -39,7 +39,11 @@ describe('setStep2Data', () => {
     useTrainerStore.getState().setStep1Data(step1Mock);
     useTrainerStore.getState().setStep2Data(step2Mock);
 
-    expect(useTrainerStore.getState().profile).toEqual({ ...step1Mock, ...step2Mock });
+    expect(useTrainerStore.getState().profile).toEqual({
+      ...step1Mock,
+      ...step2Mock,
+      starterPokemon: null,
+    });
   });
 
   it('no crea perfil si step1Data es null', () => {
@@ -87,6 +91,10 @@ describe('startCreate', () => {
 
     useTrainerStore.getState().startCreate();
 
-    expect(useTrainerStore.getState().profile).toEqual({ ...step1Mock, ...step2Mock });
+    expect(useTrainerStore.getState().profile).toEqual({
+      ...step1Mock,
+      ...step2Mock,
+      starterPokemon: null,
+    });
   });
 });

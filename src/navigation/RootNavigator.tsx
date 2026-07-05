@@ -1,8 +1,9 @@
-﻿import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '../constants/colors';
+import { TeamScreen } from '../features/team/screens/TeamScreen';
 import { useTrainerStore } from '../store/trainerStore';
 import { PokedexStack } from './PokedexStack';
 import { TrainerStack } from './TrainerStack';
@@ -73,6 +74,21 @@ export const RootNavigator: React.FC = () => {
             }
           },
         })}
+      />
+      <Tab.Screen
+        name="Team"
+        component={TeamScreen}
+        options={{
+          headerShown: true,
+          headerStyle: { backgroundColor: Colors.primary },
+          headerTintColor: Colors.textLight,
+          headerTitleStyle: { fontWeight: '700' },
+          headerTitle: 'Mi Equipo',
+          tabBarLabel: 'Mi Equipo',
+          tabBarIcon: ({ focused }) => (
+            <TabIcon emoji="⚡" focused={focused} accessibilityLabel="Mi Equipo" />
+          ),
+        }}
       />
     </Tab.Navigator>
   );

@@ -1,6 +1,8 @@
-﻿import React from 'react';
-import { Image } from 'react-native';
+import React from 'react';
+import { Image, StyleSheet, View } from 'react-native';
 import { Card, Text, YStack } from 'tamagui';
+import { Colors } from '../../../constants/colors';
+import { useTrainerStore } from '../../../store/trainerStore';
 import { capitalize, getPokemonImageUrl } from '../../../utils/pokemonHelpers';
 import { PokemonWithId } from '../types/pokemon.types';
 
@@ -9,12 +11,23 @@ interface PokemonCardProps {
   onPress: (id: number, name: string) => void;
 }
 
+const PokeballBadge: React.FC = () => (
+  <View style={styles.pokeballBadge} accessibilityLabel="Pokémon capturado">
+    <View style={styles.pokeballTop} />
+    <View style={styles.pokeballBar} />
+    <View style={styles.pokeballCenter} />
+  </View>
+);
+
 export const PokemonCard = React.memo(function PokemonCard({
   pokemon,
   onPress,
 }: PokemonCardProps) {
   const imageUrl = getPokemonImageUrl(pokemon.id);
   const paddedId = String(pokemon.id).padStart(3, '0');
+  const isCaptured = useTrainerStore(
+    (state) => state.captured.some((c) => c.id === pokemon.id)
+  );
 
   return (
     <Card
@@ -37,6 +50,7 @@ export const PokemonCard = React.memo(function PokemonCard({
           resizeMode="contain"
           accessibilityLabel={'Imagen de ' + capitalize(pokemon.name)}
         />
+        {isCaptured && <PokeballBadge />}
       </YStack>
       <YStack p="$2.5" items="center">
         <Text fontSize={12} color="$textSecondary" fontWeight="500">
@@ -48,4 +62,50 @@ export const PokemonCard = React.memo(function PokemonCard({
       </YStack>
     </Card>
   );
+});
+
+const styles = StyleSheet.create({
+  pokeballBadge: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    overflow: 'hidden',
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  pokeballTop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '50%',
+    backgroundColor: Colors.primary,
+  },
+  pokeballBar: {
+    position: 'absolute',
+    top: '50%',
+    left: 0,
+    right: 0,
+    height: 2,
+    marginTop: -1,
+    backgroundColor: '#333',
+    zIndex: 1,
+  },
+  pokeballCenter: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#fff',
+    borderWidth: 1.5,
+    borderColor: '#333',
+    marginTop: -4,
+    marginLeft: -4,
+    zIndex: 2,
+  },
 });
