@@ -10,7 +10,7 @@ const Stack = createNativeStackNavigator<TeamStackParamList>();
 
 const TeamHeaderTitle: React.FC = () => (
   <View style={headerStyles.row}>
-    <View style={[headerStyles.badge, { backgroundColor: '#F59E0B' }]}>
+    <View style={[headerStyles.badge, { backgroundColor: Colors.amber }]}>
       <Text style={headerStyles.badgeIcon}>⚡</Text>
     </View>
     <Text style={headerStyles.title}>Mi Equipo</Text>
@@ -21,7 +21,7 @@ const headerStyles = StyleSheet.create({
   row:       { flexDirection: 'row', alignItems: 'center', gap: 10 },
   badge:     { width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: 'rgba(255,255,255,0.5)' },
   badgeIcon: { fontSize: 13, lineHeight: 16 },
-  title:     { fontSize: 18, fontWeight: '800', color: '#fff', letterSpacing: 0.5 },
+  title:     { fontSize: 18, fontWeight: '800', color: Colors.textLight, letterSpacing: 0.5 },
 });
 
 export const TeamStack: React.FC = () => (

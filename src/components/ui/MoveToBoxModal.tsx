@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from 'tamagui';
+import { Colors } from '../../constants/colors';
 
 interface Props {
   visible: boolean;
@@ -41,7 +42,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: Colors.surface,
     borderRadius: 16,
     padding: 24,
     width: '100%',
@@ -50,12 +51,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1a1a1a',
+    color: Colors.text,
   },
   body: {
     fontSize: 14,
     lineHeight: 22,
-    color: '#666',
+    color: Colors.textSecondary,
   },
   actions: {
     flexDirection: 'row',
@@ -68,20 +69,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: Colors.border,
   },
   btnCancelText: {
-    color: '#444',
+    color: Colors.text,
     fontSize: 14,
   },
   btnConfirm: {
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 8,
-    backgroundColor: '#6366F1',
+    backgroundColor: Colors.indigo,
   },
   btnConfirmText: {
-    color: '#fff',
+    color: Colors.textLight,
     fontSize: 14,
     fontWeight: '600',
   },

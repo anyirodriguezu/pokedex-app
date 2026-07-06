@@ -2,11 +2,11 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text } from 'tamagui';
+import { Colors } from '../constants/colors';
 import { Step1PersonalDataScreen } from '../features/trainer/screens/Step1PersonalDataScreen';
 import { Step2PreferencesScreen } from '../features/trainer/screens/Step2PreferencesScreen';
 import { StarterPokemonScreen } from '../features/trainer/screens/StarterPokemonScreen';
 import { SummaryScreen } from '../features/trainer/screens/SummaryScreen';
-import { Colors } from '../constants/colors';
 import { TrainerStackParamList } from './types';
 import { useTrainerStore } from '../store/trainerStore';
 
@@ -14,7 +14,7 @@ const Stack = createNativeStackNavigator<TrainerStackParamList>();
 
 const ProfileHeaderTitle: React.FC = () => (
   <View style={headerStyles.row}>
-    <View style={[headerStyles.badge, { backgroundColor: '#8B5CF6' }]}>
+    <View style={[headerStyles.badge, { backgroundColor: Colors.violet }]}>
       <Text style={headerStyles.badgeIcon}>🎒</Text>
     </View>
     <Text style={headerStyles.title}>Tu Perfil</Text>
@@ -29,7 +29,7 @@ const headerStyles = StyleSheet.create({
     borderWidth: 2, borderColor: 'rgba(255,255,255,0.5)',
   },
   badgeIcon: { fontSize: 13, lineHeight: 16 },
-  title: { fontSize: 18, fontWeight: '800', color: '#fff', letterSpacing: 0.5 },
+  title: { fontSize: 18, fontWeight: '800', color: Colors.textLight, letterSpacing: 0.5 },
 });
 
 export const TrainerStack: React.FC = () => {

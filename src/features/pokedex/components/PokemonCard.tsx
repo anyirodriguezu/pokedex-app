@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { Card, Text, YStack } from 'tamagui';
 import { Colors } from '../../../constants/colors';
 import { useTrainerStore } from '../../../store/trainerStore';
 import { capitalize, getPokemonImageUrl } from '../../../utils/pokemonHelpers';
 import { PokemonWithId } from '../types/pokemon.types';
+import { SkeletonBlock } from './SkeletonBlock';
 
 interface PokemonCardProps {
   pokemon: PokemonWithId;
@@ -23,6 +24,7 @@ export const PokemonCard = React.memo(function PokemonCard({
   pokemon,
   onPress,
 }: PokemonCardProps) {
+  const [imageLoaded, setImageLoaded] = useState(false);
   const imageUrl = getPokemonImageUrl(pokemon.id);
   const paddedId = String(pokemon.id).padStart(3, '0');
   const isCaptured = useTrainerStore(
@@ -53,11 +55,17 @@ export const PokemonCard = React.memo(function PokemonCard({
         pb="$1"
         style={styles.imageArea}
       >
-        <View style={!isCaptured ? (styles.grayscaleWrapper as object) : undefined}>
+        <View style={[styles.spriteContainer, !isCaptured ? (styles.grayscaleWrapper as object) : undefined]}>
+          {!imageLoaded && (
+            <View style={styles.skeletonOverlay}>
+              <SkeletonBlock width={100} height={100} borderRadius={8} />
+            </View>
+          )}
           <Image
             source={{ uri: imageUrl }}
-            style={[styles.sprite, !isCaptured && styles.spriteUncaptured]}
+            style={[styles.sprite, !isCaptured && styles.spriteUncaptured, !imageLoaded && styles.imageHidden]}
             resizeMode="contain"
+            onLoad={() => setImageLoaded(true)}
             accessibilityLabel={'Imagen de ' + capitalize(pokemon.name)}
           />
         </View>
@@ -96,6 +104,18 @@ const styles = StyleSheet.create({
   grayscaleWrapper: {
     // RN 0.76+ CSS filter support
     filter: 'grayscale(1)',
+  },
+  spriteContainer: {
+    width: 100,
+    height: 100,
+  },
+  skeletonOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+  },
+  imageHidden: {
+    opacity: 0,
   },
   sprite: {
     width: 100,

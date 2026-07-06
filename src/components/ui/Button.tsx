@@ -31,8 +31,8 @@ const BaseButton = styled(TamaguiButton, {
       muted: {
         bg: 'transparent',
         borderWidth: 1.5,
-        borderColor: '#D4895A',
-        color: '#D4895A',
+        borderColor: '$muted',
+        color: '$muted',
       },
     },
   } as const,
@@ -61,7 +61,7 @@ export const Button: React.FC<ButtonProps> = ({
       accessibilityRole="button"
       accessibilityLabel={loading ? 'Cargando' : label}
       accessibilityState={{ disabled: disabled || loading, busy: loading }}
-      icon={loading ? <ActivityIndicator testID="loading-indicator" color={variant === 'muted' ? '#D4895A' : variant === 'outline' ? Colors.primary : Colors.textLight} /> : undefined}
+      icon={loading ? <ActivityIndicator testID="loading-indicator" color={variant === 'muted' ? Colors.muted : variant === 'outline' ? Colors.primary : Colors.textLight} /> : undefined}
     >
       {loading ? null : label}
     </BaseButton>

@@ -13,6 +13,15 @@ export const Colors = {
   tabBar: '#FFFFFF',
   tabBarActive: '#E3350D',
   tabBarInactive: '#9E9E9E',
+  indigo: '#6366F1',
+  indigoSubtle: '#EEF2FF',
+  teamGreen: '#22C55E',
+  teamGreenSubtle: '#F0FDF4',
+  muted: '#D4895A',
+  violet: '#8B5CF6',
+  amber: '#F59E0B',
+  darkNavy: '#1a1a2e',
+  gold: '#FFD700',
 
   typeColors: {
     fire: '#F08030',

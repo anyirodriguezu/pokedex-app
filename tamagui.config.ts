@@ -14,6 +14,15 @@ const customTokens = {
   appBorder: '#E0E0E0',
   error: '#D32F2F',
   success: '#388E3C',
+  indigo: '#6366F1',
+  indigoSubtle: '#EEF2FF',
+  teamGreen: '#22C55E',
+  teamGreenSubtle: '#F0FDF4',
+  muted: '#D4895A',
+  violet: '#8B5CF6',
+  amber: '#F59E0B',
+  darkNavy: '#1a1a2e',
+  gold: '#FFD700',
 };
 
 export const tamaguiConfig = createTamagui({

@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: Colors.surface,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
@@ -122,11 +122,11 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 18,
     fontWeight: '800',
-    color: '#1a1a1a',
+    color: Colors.text,
   },
   cardSubtitle: {
     fontSize: 13,
-    color: '#555',
+    color: Colors.textSecondary,
     lineHeight: 20,
   },
   highlight: {
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#888',
+    color: Colors.textSecondary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
@@ -154,9 +154,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 12,
     borderWidth: 1.5,
-    borderColor: '#eee',
+    borderColor: Colors.border,
     marginBottom: 8,
-    backgroundColor: '#fafafa',
+    backgroundColor: Colors.background,
     gap: 12,
   },
   memberSprite: {
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     fontWeight: '600',
-    color: '#1a1a1a',
+    color: Colors.text,
   },
   swapArrow: {
     fontSize: 20,
@@ -178,13 +178,13 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   btnBox: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: Colors.darkNavy,
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: 'center',
   },
   btnBoxText: {
-    color: '#fff',
+    color: Colors.textLight,
     fontSize: 15,
     fontWeight: '700',
   },
@@ -193,10 +193,10 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: Colors.border,
   },
   btnCancelText: {
-    color: '#666',
+    color: Colors.textSecondary,
     fontSize: 14,
   },
 });

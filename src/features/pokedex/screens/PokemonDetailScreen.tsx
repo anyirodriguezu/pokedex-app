@@ -423,7 +423,7 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
             <XStack flexWrap="wrap" gap="$2">
               {data.abilities.map((a) => (
                 <YStack key={a.ability.name} px="$3" py="$1.5" rounded={20} gap="$0.5"
-                  items="center" style={{ backgroundColor: a.is_hidden ? '#7C3AED' : typeColor }}>
+                  items="center" justify="center" style={{ backgroundColor: a.is_hidden ? '#7C3AED' : typeColor }}>
                   <Text fontSize={13} fontWeight="600" color="$textLight">
                     {capitalize(a.ability.name.replace(/-/g, ' '))}
                   </Text>
