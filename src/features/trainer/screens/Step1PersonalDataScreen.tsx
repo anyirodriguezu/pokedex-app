@@ -19,7 +19,7 @@ type Props = NativeStackScreenProps<TrainerStackParamList, 'Step1PersonalData'>;
 export const Step1PersonalDataScreen: React.FC<Props> = ({ navigation, route }) => {
   const mode = route.params?.mode ?? 'create';
   const isEditBasic = mode === 'edit-basic';
-  const { setStep1Data, setStep2Data, step1Data, isEditing, profile } = useTrainerStore();
+  const { setStep1Data, setStep2Data, step1Data, isEditing, profile, trainerName } = useTrainerStore();
   const scrollViewRef = useRef<ScrollView>(null);
 
   const {
@@ -44,7 +44,7 @@ export const Step1PersonalDataScreen: React.FC<Props> = ({ navigation, route }) 
           email: step1Data?.email ?? '',
         });
       } else {
-        reset({ fullName: '', age: undefined, email: '' });
+        reset({ fullName: trainerName ?? '', age: undefined, email: '' });
       }
     }, [isEditing, step1Data, reset])
   );

@@ -3,16 +3,14 @@ import React, { useState } from 'react';
 import { FlatList, Image, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { MoveToBoxModal } from '../../../components/ui/MoveToBoxModal';
 import { ReleaseModal } from '../../../components/ui/ReleaseModal';
-import { Card, Text, XStack, YStack } from 'tamagui';
+import { TransferMachineModal } from '../../../components/ui/TransferMachineModal';
+import { Text, XStack, YStack } from 'tamagui';
 import { EmptyState } from '../../../components/ui/EmptyState';
 import { Colors } from '../../../constants/colors';
-import { getTrainerTypeColor, getTextColor } from '../../../utils/pokemonHelpers';
 import { useTrainerStore } from '../../../store/trainerStore';
-import { TYPE_EMOJI } from '../../trainer/constants/typeEmoji';
 import { CapturedPokemon, MAX_ACTIVE_TEAM } from '../../trainer/types/trainer.types';
 import { ReleaseEffect } from '../../pokedex/components/ReleaseEffect';
 
-// Slot vacío con pokébola outline
 const EmptySlot: React.FC<{ index: number; slotSize: number }> = ({ index, slotSize }) => (
   <View
     style={[styles.emptySlot, { width: slotSize, height: slotSize + 24 }]}
@@ -29,12 +27,6 @@ const EmptySlot: React.FC<{ index: number; slotSize: number }> = ({ index, slotS
   </View>
 );
 
-interface TeamSlotProps {
-  pokemon: CapturedPokemon;
-  onRelease: (id: number) => void;
-  onMoveToBox: (id: number) => void;
-}
-
 interface SlotMenuProps {
   pokemon: CapturedPokemon;
   onRelease: (id: number) => void;
@@ -43,6 +35,7 @@ interface SlotMenuProps {
   onToggle: () => void;
   onClose: () => void;
   slotSize: number;
+  menuBelow?: boolean;
 }
 
 const TeamSlot: React.FC<SlotMenuProps> = ({
@@ -53,6 +46,7 @@ const TeamSlot: React.FC<SlotMenuProps> = ({
   onToggle,
   onClose,
   slotSize,
+  menuBelow = false,
 }) => (
   <View style={[styles.teamSlot, { width: slotSize }]}>
     <Pressable
@@ -76,14 +70,14 @@ const TeamSlot: React.FC<SlotMenuProps> = ({
     {menuOpen && (
       <>
         <Pressable style={styles.slotMenuOverlay} onPress={onClose} />
-        <View style={styles.slotMenu}>
+        <View style={[styles.slotMenu, menuBelow ? styles.slotMenuBelow : styles.slotMenuAbove]}>
           <Pressable
             style={styles.slotMenuBtn}
             onPress={() => { onClose(); onMoveToBox(pokemon.id); }}
             accessibilityRole="button"
-            accessibilityLabel="Mover a Caja PC"
+            accessibilityLabel="Mover al Laboratorio"
           >
-            <Text style={styles.slotMenuText}>📦 A la Caja</Text>
+            <Text style={styles.slotMenuText}>🧪 Al Laboratorio</Text>
           </Pressable>
           <Pressable
             style={[styles.slotMenuBtn, styles.slotMenuBtnDanger]}
@@ -99,14 +93,13 @@ const TeamSlot: React.FC<SlotMenuProps> = ({
   </View>
 );
 
-interface BoxCardProps {
+interface LabCardProps {
   pokemon: CapturedPokemon;
-  onMoveToTeam: (id: number) => void;
   onRelease: (id: number) => void;
   teamFull: boolean;
 }
 
-const BoxCard: React.FC<BoxCardProps> = ({ pokemon, onMoveToTeam, onRelease, teamFull }) => (
+const LabCard: React.FC<LabCardProps> = ({ pokemon, onRelease, teamFull }) => (
   <View style={styles.boxCard}>
     <Image
       source={{ uri: pokemon.sprite }}
@@ -115,16 +108,6 @@ const BoxCard: React.FC<BoxCardProps> = ({ pokemon, onMoveToTeam, onRelease, tea
       accessibilityLabel={pokemon.name}
     />
     <Text style={styles.boxName} numberOfLines={1}>{pokemon.name}</Text>
-    <Pressable
-      style={[styles.boxBtn, teamFull && styles.boxBtnDisabled]}
-      onPress={() => !teamFull && onMoveToTeam(pokemon.id)}
-      accessibilityRole="button"
-      accessibilityLabel={teamFull ? 'Equipo lleno' : `Mover ${pokemon.name} al equipo`}
-    >
-      <Text style={[styles.boxBtnText, teamFull && styles.boxBtnTextDisabled]}>
-        {teamFull ? '🔒' : '⚡'}
-      </Text>
-    </Pressable>
     <Pressable
       style={styles.boxReleaseBtn}
       onPress={() => onRelease(pokemon.id)}
@@ -138,14 +121,15 @@ const BoxCard: React.FC<BoxCardProps> = ({ pokemon, onMoveToTeam, onRelease, tea
 
 const TEAM_COLS = 3;
 const TEAM_GAP = 8;
-const CONTENT_PADDING = 32; // 16px each side
+const CONTENT_PADDING = 32;
 
 export const TeamScreen: React.FC = () => {
-  const { profile, activeTeam, box, release, moveToTeam, moveToBox } = useTrainerStore();
+  const { activeTeam, box, release, moveToTeam, moveToBox, swapPokemon } = useTrainerStore();
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [releasingId, setReleasingId] = useState<number | null>(null);
   const [movingToBoxId, setMovingToBoxId] = useState<number | null>(null);
   const [releaseAnimId, setReleaseAnimId] = useState<number | null>(null);
+  const [showTransfer, setShowTransfer] = useState(false);
   const { width: screenWidth } = useWindowDimensions();
 
   const slotSize = Math.floor(
@@ -160,11 +144,8 @@ export const TeamScreen: React.FC = () => {
     ? allPokemon.find((c) => c.id === movingToBoxId) ?? null
     : null;
 
-  const typeColor = profile ? getTrainerTypeColor(profile.favoritePokemonType) : Colors.primary;
-  const typeTextColor = getTextColor(typeColor);
   const teamFull = activeTeam.length >= MAX_ACTIVE_TEAM;
 
-  // Build 6-slot grid + invisible fillers to complete the last row
   const teamSlots = Array.from({ length: MAX_ACTIVE_TEAM }, (_, i) => ({
     index: i,
     pokemon: activeTeam[i] ?? null,
@@ -178,161 +159,135 @@ export const TeamScreen: React.FC = () => {
 
   return (
     <View style={styles.screenRoot}>
-    <FlatList
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      data={box}
-      keyExtractor={(item) => String(item.id)}
-      ListHeaderComponent={
-        <YStack gap="$4">
-          {/* Trainer summary */}
-          {profile ? (
-            <Card bg="$surface" rounded={20} p="$4" elevation={4} gap="$3">
-              <XStack items="center" gap="$3">
-                <YStack
-                  width={52}
-                  height={52}
-                  rounded={26}
-                  items="center"
-                  justify="center"
-                  style={{ backgroundColor: typeColor }}
-                >
-                  <Text style={[styles.avatarLetter, { color: typeTextColor }]}>
-                    {profile.fullName.charAt(0).toUpperCase()}
-                  </Text>
-                </YStack>
-                <YStack flex={1}>
-                  <Text style={styles.trainerName}>{profile.fullName}</Text>
-                  <Text style={styles.trainerType}>
-                    {TYPE_EMOJI[profile.favoritePokemonType]} {profile.favoritePokemonType}
-                  </Text>
-                </YStack>
-              </XStack>
-              {profile.starterPokemon && (
-                <XStack items="center" gap="$3" bg="$appBackground" rounded={12} p="$3">
-                  <Image
-                    source={{ uri: profile.starterPokemon.sprite }}
-                    style={styles.starterSprite}
-                    resizeMode="contain"
-                    accessibilityLabel={`Pokémon inicial: ${profile.starterPokemon.name}`}
-                  />
-                  <YStack>
-                    <Text style={styles.starterLabel}>Pokémon Inicial</Text>
-                    <Text style={styles.starterName}>{profile.starterPokemon.name}</Text>
-                  </YStack>
-                </XStack>
-              )}
-            </Card>
-          ) : (
-            <Card bg="$surface" rounded={16} p="$4" elevation={2}>
-              <Text style={styles.noProfileText}>
-                Completa tu registro de entrenador para ver tu perfil aquí
-              </Text>
-            </Card>
-          )}
-
-          {/* Active team — 7 slots */}
-          <YStack gap="$3">
-            <XStack justify="space-between" items="center">
-              <Text style={styles.sectionTitle}>Equipo Activo</Text>
-              <Text style={styles.sectionCount}>
-                {activeTeam.length}/{MAX_ACTIVE_TEAM}
-              </Text>
-            </XStack>
-
-            <View style={styles.teamGrid}>
-              {gridItems.map(({ index, pokemon, isFiller }) =>
-                isFiller ? (
-                  <View key={`filler-${index}`} style={{ width: slotSize }} />
-                ) : pokemon ? (
-                  <TeamSlot
-                    key={pokemon.id}
-                    pokemon={pokemon}
-                    slotSize={slotSize}
-                    menuOpen={openMenuId === pokemon.id}
-                    onToggle={() => setOpenMenuId((prev) => (prev === pokemon.id ? null : pokemon.id))}
-                    onClose={() => setOpenMenuId(null)}
-                    onRelease={(id) => setReleasingId(id)}
-                    onMoveToBox={(id) => setMovingToBoxId(id)}
-                  />
-                ) : (
-                  <EmptySlot key={`empty-${index}`} index={index} slotSize={slotSize} />
-                )
-              )}
-            </View>
-          </YStack>
-
-          {/* PC Box header */}
-          {box.length > 0 && (
-            <YStack gap="$2">
+      <FlatList
+        style={styles.container}
+        contentContainerStyle={styles.content}
+        data={box}
+        keyExtractor={(item) => String(item.id)}
+        ListHeaderComponent={
+          <YStack gap="$4">
+            {/* Equipo activo */}
+            <YStack gap="$3">
               <XStack justify="space-between" items="center">
-                <Text style={styles.sectionTitle}>📦 Caja PC</Text>
-                <Text style={styles.sectionCount}>{box.length} pokémon</Text>
+                <Text style={styles.sectionTitle}>Equipo Activo</Text>
+                <Text style={styles.sectionCount}>
+                  {activeTeam.length}/{MAX_ACTIVE_TEAM}
+                </Text>
               </XStack>
-              <Text style={styles.boxHint}>
-                {teamFull
-                  ? 'Tu equipo está lleno. Libera un slot para mover pokémon al equipo.'
-                  : 'Toca ⚡ para mover un pokémon al equipo activo.'}
-              </Text>
+
+              <View style={styles.teamGrid}>
+                {gridItems.map(({ index, pokemon, isFiller }) =>
+                  isFiller ? (
+                    <View key={`filler-${index}`} style={{ width: slotSize }} />
+                  ) : pokemon ? (
+                    <TeamSlot
+                      key={pokemon.id}
+                      pokemon={pokemon}
+                      slotSize={slotSize}
+                      menuOpen={openMenuId === pokemon.id}
+                      menuBelow={index < TEAM_COLS}
+                      onToggle={() => setOpenMenuId((prev) => (prev === pokemon.id ? null : pokemon.id))}
+                      onClose={() => setOpenMenuId(null)}
+                      onRelease={(id) => setReleasingId(id)}
+                      onMoveToBox={(id) => setMovingToBoxId(id)}
+                    />
+                  ) : (
+                    <EmptySlot key={`empty-${index}`} index={index} slotSize={slotSize} />
+                  )
+                )}
+              </View>
             </YStack>
-          )}
-        </YStack>
-      }
-      renderItem={({ item }) => (
-        <BoxCard
-          pokemon={item}
-          teamFull={teamFull}
-          onMoveToTeam={(id) => {
-            moveToTeam(id);
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-          }}
-          onRelease={(id) => setReleasingId(id)}
-        />
-      )}
-      numColumns={3}
-      columnWrapperStyle={styles.boxRow}
-      ListEmptyComponent={
-        activeTeam.length === 0 ? (
-          <EmptyState message="No has capturado ningún Pokémon todavía" />
-        ) : null
-      }
-      ListFooterComponent={<View style={{ height: 32 }} />}
-    />
 
-    <MoveToBoxModal
-      visible={movingToBoxId !== null}
-      pokemonName={movingToBoxPokemon?.name ?? ''}
-      onConfirm={() => {
-        if (movingToBoxId !== null) {
-          moveToBox(movingToBoxId);
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            {/* Laboratorio header */}
+            {box.length > 0 && (
+              <YStack gap="$2">
+                <XStack justify="space-between" items="center">
+                  <Text style={styles.sectionTitle}>🧪 Laboratorio Pokémon</Text>
+                  <Text style={styles.sectionCount}>{box.length} pokémon</Text>
+                </XStack>
+                <Pressable
+                  style={styles.transferBtn}
+                  onPress={() => setShowTransfer(true)}
+                  accessibilityRole="button"
+                  accessibilityLabel="Abrir Máquina de Transferencias"
+                >
+                  <Text style={styles.transferBtnText}>⚡ Máquina de Transferencias</Text>
+                </Pressable>
+                <Text style={styles.boxHint}>
+                  {teamFull
+                    ? 'Equipo completo. Usa la Máquina de Transferencias para intercambiar.'
+                    : 'Usa la Máquina de Transferencias para mover pokémon al equipo.'}
+                </Text>
+              </YStack>
+            )}
+          </YStack>
         }
-        setMovingToBoxId(null);
-      }}
-      onCancel={() => setMovingToBoxId(null)}
-    />
-
-    <ReleaseModal
-      visible={releasingId !== null}
-      pokemonName={releasingPokemon?.name ?? ''}
-      context="team"
-      onConfirm={() => {
-        setReleaseAnimId(releasingId);
-        setReleasingId(null);
-      }}
-      onCancel={() => setReleasingId(null)}
-    />
-
-    <ReleaseEffect
-      visible={releaseAnimId !== null}
-      onComplete={() => {
-        if (releaseAnimId !== null) {
-          release(releaseAnimId);
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+        renderItem={({ item }) => (
+          <LabCard
+            pokemon={item}
+            teamFull={teamFull}
+            onRelease={(id) => setReleasingId(id)}
+          />
+        )}
+        numColumns={3}
+        columnWrapperStyle={styles.boxRow}
+        ListEmptyComponent={
+          activeTeam.length === 0 ? (
+            <EmptyState message="No has capturado ningún Pokémon todavía" />
+          ) : null
         }
-        setReleaseAnimId(null);
-      }}
-    />
+        ListFooterComponent={<View style={{ height: 32 }} />}
+      />
+
+      <MoveToBoxModal
+        visible={movingToBoxId !== null}
+        pokemonName={movingToBoxPokemon?.name ?? ''}
+        onConfirm={() => {
+          if (movingToBoxId !== null) {
+            moveToBox(movingToBoxId);
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }
+          setMovingToBoxId(null);
+        }}
+        onCancel={() => setMovingToBoxId(null)}
+      />
+
+      <ReleaseModal
+        visible={releasingId !== null}
+        pokemonName={releasingPokemon?.name ?? ''}
+        context="team"
+        onConfirm={() => {
+          setReleaseAnimId(releasingId);
+          setReleasingId(null);
+        }}
+        onCancel={() => setReleasingId(null)}
+      />
+
+      <ReleaseEffect
+        visible={releaseAnimId !== null}
+        onComplete={() => {
+          if (releaseAnimId !== null) {
+            release(releaseAnimId);
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+          }
+          setReleaseAnimId(null);
+        }}
+      />
+
+      <TransferMachineModal
+        visible={showTransfer}
+        labPokemon={box}
+        activeTeam={activeTeam}
+        onMoveToTeam={(labId) => {
+          moveToTeam(labId);
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        }}
+        onSwap={(labId, teamMemberId) => {
+          swapPokemon(labId, teamMemberId);
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        }}
+        onClose={() => setShowTransfer(false)}
+      />
     </View>
   );
 };
@@ -349,7 +304,6 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 16,
   },
-  // Team grid
   teamGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -390,7 +344,6 @@ const styles = StyleSheet.create({
   },
   slotMenu: {
     position: 'absolute',
-    bottom: '100%',
     left: 0,
     right: 0,
     backgroundColor: '#fff',
@@ -402,6 +355,14 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     zIndex: 10,
     overflow: 'hidden',
+  },
+  slotMenuAbove: {
+    bottom: '100%',
+    marginBottom: 4,
+  },
+  slotMenuBelow: {
+    top: '100%',
+    marginTop: 4,
   },
   slotMenuBtn: {
     paddingVertical: 10,
@@ -420,7 +381,6 @@ const styles = StyleSheet.create({
   slotMenuTextDanger: {
     color: '#E53935',
   },
-  // Empty slot
   emptySlot: {
     borderRadius: 14,
     borderWidth: 2,
@@ -482,39 +442,6 @@ const styles = StyleSheet.create({
     color: '#bbb',
     fontWeight: '500',
   },
-  // Trainer card
-  avatarLetter: {
-    fontSize: 22,
-    fontWeight: '800',
-  },
-  trainerName: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#1a1a1a',
-  },
-  trainerType: {
-    fontSize: 13,
-    color: '#666',
-  },
-  starterSprite: {
-    width: 56,
-    height: 56,
-  },
-  starterLabel: {
-    fontSize: 12,
-    color: '#999',
-  },
-  starterName: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#1a1a1a',
-  },
-  noProfileText: {
-    fontSize: 14,
-    color: '#999',
-    textAlign: 'center',
-  },
-  // Sections
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
@@ -524,12 +451,23 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#999',
   },
+  transferBtn: {
+    backgroundColor: '#1a1a2e',
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  transferBtnText: {
+    color: '#FFD700',
+    fontSize: 15,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
   boxHint: {
     fontSize: 12,
     color: '#aaa',
     fontStyle: 'italic',
   },
-  // PC Box
   boxRow: {
     gap: 8,
     marginBottom: 8,
@@ -554,23 +492,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#333',
     textAlign: 'center',
-  },
-  boxBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#22C55E',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  boxBtnDisabled: {
-    backgroundColor: '#e0e0e0',
-  },
-  boxBtnText: {
-    fontSize: 14,
-  },
-  boxBtnTextDisabled: {
-    opacity: 0.4,
   },
   boxReleaseBtn: {
     paddingVertical: 2,

@@ -45,7 +45,7 @@ export const TeamFullModal: React.FC<Props> = ({
               <Text style={styles.cardTitle}>¡Equipo completo! ⚡</Text>
               <Text style={styles.cardSubtitle}>
                 <Text style={styles.highlight}>{newPokemon.name}</Text> quiere unirse.{'\n'}
-                Toca a quién reemplaza o envíalo a la Caja.
+                Toca a quién reemplaza o envíalo al Laboratorio.
               </Text>
             </View>
           </View>
@@ -77,9 +77,9 @@ export const TeamFullModal: React.FC<Props> = ({
               style={styles.btnBox}
               onPress={onSendToBox}
               accessibilityRole="button"
-              accessibilityLabel="Enviar a la Caja PC"
+              accessibilityLabel="Enviar al Laboratorio"
             >
-              <Text style={styles.btnBoxText}>📦 Enviar a la Caja PC</Text>
+              <Text style={styles.btnBoxText}>🧪 Enviar al Laboratorio</Text>
             </Pressable>
             <Pressable
               style={styles.btnCancelFull}

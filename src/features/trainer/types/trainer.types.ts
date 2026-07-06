@@ -34,6 +34,8 @@ export interface TrainerStoreState {
   activeTeam: CapturedPokemon[];
   box: CapturedPokemon[];
   hasSeenSplash: boolean;
+  trainerName: string | null;
+  setTrainerName: (name: string) => void;
   setStep1Data: (data: Step1Data) => void;
   setStep2Data: (data: Step2Data) => void;
   setStarterPokemon: (pokemon: CapturedPokemon) => void;

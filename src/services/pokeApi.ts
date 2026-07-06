@@ -1,7 +1,9 @@
 import { API_BASE_URL, POKEMON_LIST_LIMIT } from '../constants/api';
 import {
+  EvolutionChainResponse,
   PokemonDetail,
   PokemonListResponse,
+  PokemonSpecies,
   PokemonTypeResponse,
 } from '../features/pokedex/types/pokemon.types';
 
@@ -31,5 +33,17 @@ export async function fetchPokemonRange(
 ): Promise<PokemonListResponse> {
   const response = await fetch(`${API_BASE_URL}/pokemon?offset=${offset}&limit=${limit}`);
   if (!response.ok) throw new Error('Error al obtener Pokémon por rango');
+  return response.json();
+}
+
+export async function fetchPokemonSpecies(id: number): Promise<PokemonSpecies> {
+  const response = await fetch(`${API_BASE_URL}/pokemon-species/${id}`);
+  if (!response.ok) throw new Error('Error al obtener la especie del Pokémon');
+  return response.json();
+}
+
+export async function fetchEvolutionChain(url: string): Promise<EvolutionChainResponse> {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error('Error al obtener la cadena de evolución');
   return response.json();
 }

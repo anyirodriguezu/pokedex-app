@@ -57,6 +57,26 @@ export const RootNavigator: React.FC = () => {
             <TabIcon emoji="📖" focused={focused} accessibilityLabel="Pokédex" />
           ),
         }}
+        listeners={({ navigation }) => ({
+          tabPress: () => {
+            navigation.navigate('Pokedex', { screen: 'PokemonList' });
+          },
+        })}
+      />
+      <Tab.Screen
+        name="Team"
+        component={TeamScreen}
+        options={{
+          headerShown: true,
+          headerStyle: { backgroundColor: Colors.primary },
+          headerTintColor: Colors.textLight,
+          headerTitleStyle: { fontWeight: '700' },
+          headerTitle: 'Mi Equipo',
+          tabBarLabel: 'Mi Equipo',
+          tabBarIcon: ({ focused }) => (
+            <TabIcon emoji="⚡" focused={focused} accessibilityLabel="Mi Equipo" />
+          ),
+        }}
       />
       <Tab.Screen
         name="Trainer"
@@ -75,21 +95,6 @@ export const RootNavigator: React.FC = () => {
             }
           },
         })}
-      />
-      <Tab.Screen
-        name="Team"
-        component={TeamScreen}
-        options={{
-          headerShown: true,
-          headerStyle: { backgroundColor: Colors.primary },
-          headerTintColor: Colors.textLight,
-          headerTitleStyle: { fontWeight: '700' },
-          headerTitle: 'Mi Equipo',
-          tabBarLabel: 'Mi Equipo',
-          tabBarIcon: ({ focused }) => (
-            <TabIcon emoji="⚡" focused={focused} accessibilityLabel="Mi Equipo" />
-          ),
-        }}
       />
     </Tab.Navigator>
   );

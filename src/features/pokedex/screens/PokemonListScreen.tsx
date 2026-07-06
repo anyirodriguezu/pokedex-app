@@ -1,9 +1,11 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import {
   ActivityIndicator,
   Animated,
   FlatList,
+  LayoutAnimation,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -45,6 +47,7 @@ export const PokemonListScreen: React.FC<Props> = ({ navigation }) => {
 
   const [selectedType, setSelectedType] = useState<PokedexTypeSlug | null>(null);
   const [selectedGen, setSelectedGen] = useState<number | null>(null);
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
 
   const { results: typeResults, isLoading: isLoadingType } = usePokemonTypeFilter(selectedType);
   const { results: genResults, isLoading: isLoadingGen } = usePokemonGenerationFilter(selectedGen);
@@ -117,6 +120,17 @@ export const PokemonListScreen: React.FC<Props> = ({ navigation }) => {
     setSelectedGen((prev) => (prev === index ? null : index));
   };
 
+  const toggleFilters = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setFiltersExpanded((v) => !v);
+  };
+
+  // Active filter summary for the collapsed state
+  const activeFiltersLabel = [
+    selectedType ? POKEDEX_TYPES.find((t) => t.slug === selectedType)?.label : null,
+    selectedGen !== null ? GENERATION_RANGES[selectedGen]?.label : null,
+  ].filter(Boolean).join(' · ');
+
   const renderItem = useCallback(
     ({ item }: { item: PokemonWithId }) => (
       <PokemonCard pokemon={item} onPress={handlePress} />
@@ -138,72 +152,103 @@ export const PokemonListScreen: React.FC<Props> = ({ navigation }) => {
       }
     : null;
 
-  // Filter chips — always visible
   const filterChips = (
     <View style={styles.filtersSection}>
-      <Text style={styles.filterLabel}>Tipo</Text>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.chipsRow}
-      >
-        {POKEDEX_TYPES.map((t) => {
-          const active = selectedType === t.slug;
-          return (
-            <Pressable
-              key={t.slug}
-              style={[styles.chip, active && styles.chipActive]}
-              onPress={() => handleTypeSelect(t.slug)}
-              accessibilityRole="button"
-              accessibilityLabel={t.label}
-              accessibilityState={{ selected: active }}
-            >
-              <Text style={[styles.chipText, active && styles.chipTextActive]}>
-                {t.label}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
-
-      <Text style={styles.filterLabel}>Generación</Text>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.chipsRow}
-      >
-        {GENERATION_RANGES.map((g, i) => {
-          const active = selectedGen === i;
-          return (
-            <Pressable
-              key={g.label}
-              style={[styles.chip, styles.chipGen, active && styles.chipGenActive]}
-              onPress={() => handleGenSelect(i)}
-              accessibilityRole="button"
-              accessibilityLabel={g.label}
-              accessibilityState={{ selected: active }}
-            >
-              <Text style={[styles.chipText, active && styles.chipTextGenActive]}>
-                {g.label}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
-
-      {(isFiltering || isSearching) && (
+      {/* Toggle row */}
+      <View style={styles.filterToggleRow}>
         <Pressable
-          style={styles.clearFilters}
-          onPress={() => {
-            setSelectedType(null);
-            setSelectedGen(null);
-            clearSearch();
-          }}
+          style={[styles.filterToggleBtn, isFiltering && styles.filterToggleBtnActive]}
+          onPress={toggleFilters}
           accessibilityRole="button"
-          accessibilityLabel="Limpiar todos los filtros"
+          accessibilityLabel={filtersExpanded ? 'Ocultar filtros' : 'Mostrar filtros'}
         >
-          <Text style={styles.clearFiltersText}>✕ Limpiar filtros</Text>
+          <Text style={[styles.filterToggleText, isFiltering && styles.filterToggleTextActive]}>
+            {filtersExpanded ? '▲ Filtros' : '▼ Filtros'}
+          </Text>
+          {isFiltering && !filtersExpanded && (
+            <View style={styles.filterActiveDot} />
+          )}
         </Pressable>
+
+        {isFiltering && !filtersExpanded && (
+          <Text style={styles.filterActiveSummary} numberOfLines={1}>
+            {activeFiltersLabel}
+          </Text>
+        )}
+
+        {(isFiltering || isSearching) && (
+          <Pressable
+            style={styles.clearFilters}
+            onPress={() => {
+              setSelectedType(null);
+              setSelectedGen(null);
+              clearSearch();
+              if (filtersExpanded) {
+                LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                setFiltersExpanded(false);
+              }
+            }}
+            accessibilityRole="button"
+            accessibilityLabel="Limpiar todos los filtros"
+          >
+            <Text style={styles.clearFiltersText}>✕ Limpiar</Text>
+          </Pressable>
+        )}
+      </View>
+
+      {/* Expandable filter panel */}
+      {filtersExpanded && (
+        <View style={styles.filterPanel}>
+          <Text style={styles.filterLabel}>Tipo</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.chipsRow}
+          >
+            {POKEDEX_TYPES.map((t) => {
+              const active = selectedType === t.slug;
+              return (
+                <Pressable
+                  key={t.slug}
+                  style={[styles.chip, active && styles.chipActive]}
+                  onPress={() => handleTypeSelect(t.slug)}
+                  accessibilityRole="button"
+                  accessibilityLabel={t.label}
+                  accessibilityState={{ selected: active }}
+                >
+                  <Text style={[styles.chipText, active && styles.chipTextActive]}>
+                    {t.label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+
+          <Text style={styles.filterLabel}>Generación</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.chipsRow}
+          >
+            {GENERATION_RANGES.map((g, i) => {
+              const active = selectedGen === i;
+              return (
+                <Pressable
+                  key={g.label}
+                  style={[styles.chip, styles.chipGen, active && styles.chipGenActive]}
+                  onPress={() => handleGenSelect(i)}
+                  accessibilityRole="button"
+                  accessibilityLabel={g.label}
+                  accessibilityState={{ selected: active }}
+                >
+                  <Text style={[styles.chipText, active && styles.chipTextGenActive]}>
+                    {g.label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+        </View>
       )}
     </View>
   );
@@ -361,26 +406,73 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   filtersSection: {
-    gap: 4,
-    paddingBottom: 8,
+    paddingBottom: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ececec',
+  },
+  filterToggleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    gap: 8,
+  },
+  filterToggleBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 5,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    backgroundColor: '#f0f0f0',
+    borderWidth: 1.5,
+    borderColor: 'transparent',
+  },
+  filterToggleBtnActive: {
+    backgroundColor: Colors.primary + '18',
+    borderColor: Colors.primary,
+  },
+  filterToggleText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#666',
+  },
+  filterToggleTextActive: {
+    color: Colors.primary,
+  },
+  filterActiveDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: Colors.primary,
+  },
+  filterActiveSummary: {
+    flex: 1,
+    fontSize: 12,
+    color: Colors.primary,
+    fontWeight: '600',
+  },
+  filterPanel: {
+    gap: 2,
+    paddingBottom: 6,
   },
   filterLabel: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '700',
     color: '#888',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginLeft: 16,
-    marginTop: 8,
+    marginTop: 6,
   },
   chipsRow: {
     paddingHorizontal: 16,
-    gap: 8,
+    gap: 6,
     paddingVertical: 4,
   },
   chip: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
     borderRadius: 20,
     backgroundColor: '#f0f0f0',
     borderWidth: 1.5,
@@ -398,7 +490,7 @@ const styles = StyleSheet.create({
     borderColor: '#6366F1',
   },
   chipText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
     color: '#555',
   },
@@ -409,9 +501,7 @@ const styles = StyleSheet.create({
     color: '#6366F1',
   },
   clearFilters: {
-    marginHorizontal: 16,
-    marginTop: 4,
-    alignSelf: 'flex-start',
+    marginLeft: 'auto',
   },
   clearFiltersText: {
     fontSize: 13,

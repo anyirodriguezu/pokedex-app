@@ -14,16 +14,16 @@ export function MoveToBoxModal({ visible, pokemonName, onConfirm, onCancel }: Pr
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onCancel}>
       <View style={styles.overlay}>
         <View style={styles.card}>
-          <Text style={styles.title}>📦 ¿Enviar a la Caja PC?</Text>
+          <Text style={styles.title}>🧪 ¿Enviar al Laboratorio?</Text>
           <Text style={styles.body}>
-            {`${pokemonName} será guardado en tu Caja PC. Podrás recuperarlo y añadirlo a tu equipo en cualquier momento.`}
+            {`${pokemonName} será guardado en el Laboratorio Pokémon. Puedes recuperarlo al equipo en cualquier momento usando la Máquina de Transferencias.`}
           </Text>
           <View style={styles.actions}>
             <Pressable style={styles.btnCancel} onPress={onCancel}>
               <Text style={styles.btnCancelText}>Cancelar</Text>
             </Pressable>
             <Pressable style={styles.btnConfirm} onPress={onConfirm}>
-              <Text style={styles.btnConfirmText}>Enviar a la Caja</Text>
+              <Text style={styles.btnConfirmText}>Al Laboratorio</Text>
             </Pressable>
           </View>
         </View>

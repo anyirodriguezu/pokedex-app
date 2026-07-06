@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
-import { Card, Text, XStack } from 'tamagui';
+import { Card, Text, XStack, YStack } from 'tamagui';
 import { Colors } from '../../../constants/colors';
 import { formatStatName } from '../../../utils/pokemonHelpers';
 import { PokemonStat } from '../types/pokemon.types';
@@ -37,9 +37,12 @@ export const PokemonStats: React.FC<PokemonStatsProps> = ({ stats }) => {
 
   return (
     <Card bg="$surface" rounded={16} p="$4" gap="$2.5">
-      <Text fontSize={18} fontWeight="700" color="$appText" mb="$1">
-        Estadísticas Base
-      </Text>
+      <XStack items="center" gap="$2">
+        <View style={styles.sectionBar} />
+        <Text fontSize={16} fontWeight="700" color="$appText" letterSpacing={0.3}>
+          Estadísticas base
+        </Text>
+      </XStack>
       {stats.map((stat, index) => {
         const barColor = STAT_COLORS[stat.stat.name] ?? Colors.primary;
         const animatedWidth = animatedValues[index].interpolate({
@@ -90,4 +93,5 @@ const styles = StyleSheet.create({
     height: '100%',
     borderRadius: 4,
   },
+  sectionBar: { width: 4, height: 18, borderRadius: 2, backgroundColor: Colors.primary },
 });

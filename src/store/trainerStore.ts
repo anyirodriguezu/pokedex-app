@@ -19,6 +19,11 @@ export const useTrainerStore = create<TrainerStoreState>()(
       activeTeam: [],
       box: [],
       hasSeenSplash: false,
+      trainerName: null,
+
+      setTrainerName: (name: string) => {
+        set({ trainerName: name });
+      },
 
       setStep1Data: (data: Step1Data) => {
         set({ step1Data: data });
@@ -140,7 +145,17 @@ export const useTrainerStore = create<TrainerStoreState>()(
         profile: state.profile,
         activeTeam: state.activeTeam,
         box: state.box,
+        trainerName: state.trainerName,
       }),
+      onRehydrateStorage: () => (state) => {
+        if (!state) return;
+        // Migra exceso al laboratorio si el equipo supera el límite actual
+        if (state.activeTeam.length > MAX_ACTIVE_TEAM) {
+          const excess = state.activeTeam.slice(MAX_ACTIVE_TEAM);
+          state.activeTeam = state.activeTeam.slice(0, MAX_ACTIVE_TEAM);
+          state.box = [...state.box, ...excess];
+        }
+      },
     }
   )
 );

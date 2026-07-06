@@ -38,27 +38,42 @@ export const PokemonCard = React.memo(function PokemonCard({
       bg="$surface"
       rounded={16}
       overflow="hidden"
-      elevation={3}
+      elevation={isCaptured ? 4 : 1}
       pressStyle={{ opacity: 0.85, scale: 0.97 }}
       onPress={() => onPress(pokemon.id, pokemon.name)}
       accessibilityRole="button"
       accessibilityLabel={capitalize(pokemon.name) + ', número ' + paddedId}
       accessibilityHint="Toca para ver los detalles"
+      style={isCaptured ? styles.cardCaptured : styles.cardUncaptured}
     >
-      <YStack bg="$appBackground" items="center" pt="$3" pb="$1">
-        <Image
-          source={{ uri: imageUrl }}
-          style={{ width: 100, height: 100 }}
-          resizeMode="contain"
-          accessibilityLabel={'Imagen de ' + capitalize(pokemon.name)}
-        />
+      <YStack
+        bg={isCaptured ? '$appBackground' : '#f0f0f0'}
+        items="center"
+        pt="$3"
+        pb="$1"
+        style={styles.imageArea}
+      >
+        {/* Grayscale wrapper para no capturados */}
+        <View style={!isCaptured ? (styles.grayscaleWrapper as object) : undefined}>
+          <Image
+            source={{ uri: imageUrl }}
+            style={[styles.sprite, !isCaptured && styles.spriteUncaptured]}
+            resizeMode="contain"
+            accessibilityLabel={'Imagen de ' + capitalize(pokemon.name)}
+          />
+        </View>
         {isCaptured && <PokeballBadge />}
       </YStack>
-      <YStack p="$2.5" items="center">
-        <Text fontSize={12} color="$textSecondary" fontWeight="500">
+      <YStack p="$2.5" items="center" style={!isCaptured && styles.textUncaptured}>
+        <Text fontSize={12} color={isCaptured ? '$textSecondary' : '#bbb'} fontWeight="500">
           #{paddedId}
         </Text>
-        <Text fontSize={14} fontWeight="700" color="$appText" mt="$0.5">
+        <Text
+          fontSize={14}
+          fontWeight="700"
+          color={isCaptured ? '$appText' : '#aaa'}
+          mt="$0.5"
+        >
           {capitalize(pokemon.name)}
         </Text>
       </YStack>
@@ -67,6 +82,32 @@ export const PokemonCard = React.memo(function PokemonCard({
 });
 
 const styles = StyleSheet.create({
+  cardCaptured: {
+    borderWidth: 2,
+    borderColor: '#22C55E',
+  },
+  cardUncaptured: {
+    borderWidth: 1,
+    borderColor: '#e8e8e8',
+    opacity: 0.75,
+  },
+  imageArea: {
+    position: 'relative',
+  },
+  grayscaleWrapper: {
+    // RN 0.76+ CSS filter support
+    filter: 'grayscale(1)',
+  },
+  sprite: {
+    width: 100,
+    height: 100,
+  },
+  spriteUncaptured: {
+    opacity: 0.7,
+  },
+  textUncaptured: {
+    opacity: 0.8,
+  },
   pokeballBadge: {
     position: 'absolute',
     top: 6,
