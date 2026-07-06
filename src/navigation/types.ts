@@ -11,7 +11,7 @@ export type TrainerStackParamList = {
   Step1PersonalData: { mode?: WizardMode };
   Step2Preferences: { mode?: WizardMode };
   StarterPokemon: { mode?: WizardMode };
-  Summary: undefined;
+  Summary: { fromEdit?: boolean };
 };
 
 export type RootTabParamList = {

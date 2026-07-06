@@ -16,6 +16,7 @@ export const useTrainerStore = create<TrainerStoreState>()(
       step1Data: null,
       isEditing: false,
       captured: [],
+      hasSeenSplash: false,
 
       setStep1Data: (data: Step1Data) => {
         set({ step1Data: data });
@@ -40,7 +41,11 @@ export const useTrainerStore = create<TrainerStoreState>()(
       },
 
       resetProfile: () => {
-        set({ profile: null, step1Data: null, isEditing: false });
+        set({ profile: null, step1Data: null, isEditing: false, hasSeenSplash: false });
+      },
+
+      setHasSeenSplash: (value: boolean) => {
+        set({ hasSeenSplash: value });
       },
 
       startEdit: () => {
@@ -59,6 +64,12 @@ export const useTrainerStore = create<TrainerStoreState>()(
 
       release: (id: number) => {
         set({ captured: get().captured.filter((c) => c.id !== id) });
+      },
+
+      releaseStarterPokemon: () => {
+        const profile = get().profile;
+        if (!profile) return;
+        set({ profile: { ...profile, starterPokemon: null } });
       },
 
       isCaptured: (id: number) => get().captured.some((c) => c.id === id),

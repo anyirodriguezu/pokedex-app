@@ -1,6 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import * as Haptics from 'expo-haptics';
 import React, { useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
@@ -50,6 +51,10 @@ export const Step1PersonalDataScreen: React.FC<Props> = ({ navigation, route }) 
   const onSubmit = (data: Step1FormValues) => {
     setStep1Data({ fullName: data.fullName, age: data.age, email: data.email });
     navigation.navigate('Step2Preferences', { mode });
+  };
+
+  const onError = () => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
   };
 
   return (
@@ -131,7 +136,7 @@ export const Step1PersonalDataScreen: React.FC<Props> = ({ navigation, route }) 
             />
           </YStack>
 
-          <Button label="Siguiente" onPress={handleSubmit(onSubmit)} />
+          <Button label="Siguiente" onPress={handleSubmit(onSubmit, onError)} />
         </YStack>
       </ScrollView>
     </KeyboardAvoidingView>

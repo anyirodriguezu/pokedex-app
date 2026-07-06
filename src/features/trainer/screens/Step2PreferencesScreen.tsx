@@ -1,6 +1,7 @@
 ﻿import { yupResolver } from '@hookform/resolvers/yup';
 import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import * as Haptics from 'expo-haptics';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { ScrollView, StyleSheet } from 'react-native';
@@ -50,6 +51,10 @@ export const Step2PreferencesScreen: React.FC<Props> = ({ navigation, route }) =
     if (!data.district || !data.favoritePokemonType) return;
     setStep2Data({ district: data.district, favoritePokemonType: data.favoritePokemonType });
     navigation.navigate('StarterPokemon', { mode });
+  };
+
+  const onError = () => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
   };
 
   return (
@@ -170,7 +175,7 @@ export const Step2PreferencesScreen: React.FC<Props> = ({ navigation, route }) =
             <Button label="Atrás" onPress={() => navigation.goBack()} variant="outline" />
           </YStack>
           <YStack flex={1}>
-            <Button label="Confirmar" onPress={handleSubmit(onSubmit)} />
+            <Button label="Confirmar" onPress={handleSubmit(onSubmit, onError)} />
           </YStack>
         </XStack>
       </YStack>

@@ -1,11 +1,18 @@
 import { useTrainerStore } from '../trainerStore';
-import { Step1Data, Step2Data } from '../../features/trainer/types/trainer.types';
+import { CapturedPokemon, Step1Data, Step2Data } from '../../features/trainer/types/trainer.types';
 
 const step1Mock: Step1Data = { fullName: 'Ash Ketchum', age: 10, email: 'ash@pokemon.com' };
 const step2Mock: Step2Data = { district: 'Kanto', favoritePokemonType: 'Fuego' };
+const pikachuMock: CapturedPokemon = { id: 25, name: 'Pikachu', sprite: 'https://example.com/25.png' };
+const charmanderMock: CapturedPokemon = { id: 4, name: 'Charmander', sprite: 'https://example.com/4.png' };
+
+const buildProfile = () => {
+  useTrainerStore.getState().setStep1Data(step1Mock);
+  useTrainerStore.getState().setStep2Data(step2Mock);
+};
 
 beforeEach(() => {
-  useTrainerStore.setState({ profile: null, step1Data: null, isEditing: false, captured: [] });
+  useTrainerStore.setState({ profile: null, step1Data: null, isEditing: false, captured: [], hasSeenSplash: false });
 });
 
 describe('estado inicial', () => {
@@ -96,5 +103,124 @@ describe('startCreate', () => {
       ...step2Mock,
       starterPokemon: null,
     });
+  });
+});
+
+describe('capture', () => {
+  it('agrega un Pokémon a captured', () => {
+    useTrainerStore.getState().capture(pikachuMock);
+    expect(useTrainerStore.getState().captured).toHaveLength(1);
+    expect(useTrainerStore.getState().captured[0]).toEqual(pikachuMock);
+  });
+
+  it('no duplica un Pokémon ya capturado', () => {
+    useTrainerStore.getState().capture(pikachuMock);
+    useTrainerStore.getState().capture(pikachuMock);
+    expect(useTrainerStore.getState().captured).toHaveLength(1);
+  });
+
+  it('permite capturar varios Pokémon distintos', () => {
+    useTrainerStore.getState().capture(pikachuMock);
+    useTrainerStore.getState().capture(charmanderMock);
+    expect(useTrainerStore.getState().captured).toHaveLength(2);
+  });
+});
+
+describe('release', () => {
+  it('elimina el Pokémon con el id dado', () => {
+    useTrainerStore.getState().capture(pikachuMock);
+    useTrainerStore.getState().capture(charmanderMock);
+
+    useTrainerStore.getState().release(25);
+
+    const captured = useTrainerStore.getState().captured;
+    expect(captured).toHaveLength(1);
+    expect(captured[0].id).toBe(4);
+  });
+
+  it('no lanza error si el id no existe en captured', () => {
+    useTrainerStore.getState().capture(pikachuMock);
+    expect(() => useTrainerStore.getState().release(999)).not.toThrow();
+    expect(useTrainerStore.getState().captured).toHaveLength(1);
+  });
+
+  it('deja captured vacío al liberar el único Pokémon', () => {
+    useTrainerStore.getState().capture(pikachuMock);
+    useTrainerStore.getState().release(25);
+    expect(useTrainerStore.getState().captured).toHaveLength(0);
+  });
+});
+
+describe('isCaptured', () => {
+  it('retorna true para un Pokémon capturado', () => {
+    useTrainerStore.getState().capture(pikachuMock);
+    expect(useTrainerStore.getState().isCaptured(25)).toBe(true);
+  });
+
+  it('retorna false para un Pokémon no capturado', () => {
+    expect(useTrainerStore.getState().isCaptured(25)).toBe(false);
+  });
+
+  it('retorna false después de liberar', () => {
+    useTrainerStore.getState().capture(pikachuMock);
+    useTrainerStore.getState().release(25);
+    expect(useTrainerStore.getState().isCaptured(25)).toBe(false);
+  });
+});
+
+describe('setStarterPokemon', () => {
+  it('asigna el starter al perfil existente', () => {
+    buildProfile();
+    useTrainerStore.getState().setStarterPokemon(pikachuMock);
+    expect(useTrainerStore.getState().profile?.starterPokemon).toEqual(pikachuMock);
+  });
+
+  it('desactiva isEditing al asignar el starter', () => {
+    buildProfile();
+    useTrainerStore.getState().startEdit();
+    useTrainerStore.getState().setStarterPokemon(pikachuMock);
+    expect(useTrainerStore.getState().isEditing).toBe(false);
+  });
+
+  it('no hace nada si no hay perfil', () => {
+    useTrainerStore.getState().setStarterPokemon(pikachuMock);
+    expect(useTrainerStore.getState().profile).toBeNull();
+  });
+});
+
+describe('releaseStarterPokemon', () => {
+  it('pone starterPokemon en null sin borrar el perfil', () => {
+    buildProfile();
+    useTrainerStore.getState().setStarterPokemon(pikachuMock);
+
+    useTrainerStore.getState().releaseStarterPokemon();
+
+    expect(useTrainerStore.getState().profile?.starterPokemon).toBeNull();
+    expect(useTrainerStore.getState().profile?.fullName).toBe('Ash Ketchum');
+  });
+
+  it('no lanza error si no hay perfil', () => {
+    expect(() => useTrainerStore.getState().releaseStarterPokemon()).not.toThrow();
+  });
+});
+
+describe('setHasSeenSplash', () => {
+  it('activa la flag a true', () => {
+    useTrainerStore.getState().setHasSeenSplash(true);
+    expect(useTrainerStore.getState().hasSeenSplash).toBe(true);
+  });
+
+  it('puede volver a false', () => {
+    useTrainerStore.getState().setHasSeenSplash(true);
+    useTrainerStore.getState().setHasSeenSplash(false);
+    expect(useTrainerStore.getState().hasSeenSplash).toBe(false);
+  });
+});
+
+describe('resetProfile', () => {
+  it('también resetea hasSeenSplash', () => {
+    useTrainerStore.getState().setHasSeenSplash(true);
+    useTrainerStore.getState().resetProfile();
+    expect(useTrainerStore.getState().hasSeenSplash).toBe(false);
   });
 });

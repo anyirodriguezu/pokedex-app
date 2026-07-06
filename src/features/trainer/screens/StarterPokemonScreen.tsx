@@ -1,12 +1,13 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import * as Haptics from 'expo-haptics';
 import React from 'react';
-import { Image, ScrollView, StyleSheet } from 'react-native';
+import { Image, ScrollView, StyleSheet, View } from 'react-native';
 import { Button } from '../../../components/ui/Button';
 import { ErrorState } from '../../../components/ui/ErrorState';
 import { Colors } from '../../../constants/colors';
 import { TrainerStackParamList } from '../../../navigation/types';
 import { useTrainerStore } from '../../../store/trainerStore';
-import { LoadingState } from '../../pokedex/components/LoadingState';
+import { SkeletonBlock } from '../../pokedex/components/SkeletonBlock';
 import { StepIndicator } from '../components/StepIndicator';
 import { useStarterPokemon } from '../hooks/useStarterPokemon';
 import { TYPE_EMOJI } from '../constants/typeEmoji';
@@ -14,20 +15,38 @@ import { Card, Text, YStack } from 'tamagui';
 
 type Props = NativeStackScreenProps<TrainerStackParamList, 'StarterPokemon'>;
 
+const StarterSkeleton: React.FC = () => (
+  <YStack flex={1} bg="$appBackground" p="$5" gap="$5">
+    <StepIndicator currentStep={3} totalSteps={3} />
+    <YStack gap="$1">
+      <SkeletonBlock width={200} height={30} borderRadius={10} />
+      <SkeletonBlock width={160} height={18} borderRadius={8} />
+    </YStack>
+    <View style={styles.skeletonCard}>
+      <SkeletonBlock width={200} height={200} borderRadius={100} />
+      <SkeletonBlock width={140} height={28} borderRadius={10} />
+      <SkeletonBlock width={200} height={16} borderRadius={8} />
+    </View>
+    <SkeletonBlock width="100%" height={44} borderRadius={10} />
+  </YStack>
+);
+
 export const StarterPokemonScreen: React.FC<Props> = ({ navigation }) => {
-  const { profile, setStarterPokemon } = useTrainerStore();
+  const { profile, setStarterPokemon, isEditing } = useTrainerStore();
   const { data, isLoading, isError, refetch } = useStarterPokemon(
     profile?.favoritePokemonType ?? null
   );
 
   const handleAccept = () => {
     if (!data) return;
+    const wasEditing = isEditing;
     setStarterPokemon(data);
-    navigation.navigate('Summary');
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    navigation.navigate('Summary', { fromEdit: wasEditing });
   };
 
   if (isLoading) {
-    return <LoadingState message="Buscando tu Pokémon inicial..." />;
+    return <StarterSkeleton />;
   }
 
   if (isError || !data) {
@@ -95,5 +114,13 @@ const styles = StyleSheet.create({
   image: {
     width: 200,
     height: 200,
+  },
+  skeletonCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: 20,
+    padding: 24,
+    alignItems: 'center',
+    gap: 16,
+    elevation: 4,
   },
 });

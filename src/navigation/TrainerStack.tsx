@@ -16,6 +16,7 @@ export const TrainerStack: React.FC = () => {
         headerStyle: { backgroundColor: Colors.primary },
         headerTintColor: Colors.textLight,
         headerTitleStyle: { fontWeight: '700' },
+        animation: 'slide_from_right',
       }}
     >
       <Stack.Screen

@@ -1,9 +1,12 @@
-import React from 'react';
+import * as Haptics from 'expo-haptics';
+import React, { useState } from 'react';
 import { Image, ScrollView, StyleSheet, View } from 'react-native';
-import { Card, Text, XStack, YStack } from 'tamagui';
+import { ReleaseModal } from '../../../components/ui/ReleaseModal';
 import { Button } from '../../../components/ui/Button';
+import { Card, Text, XStack, YStack } from 'tamagui';
 import { EmptyState } from '../../../components/ui/EmptyState';
 import { Colors } from '../../../constants/colors';
+import { getTrainerTypeColor, getTextColor } from '../../../utils/pokemonHelpers';
 import { useTrainerStore } from '../../../store/trainerStore';
 import { TYPE_EMOJI } from '../../trainer/constants/typeEmoji';
 import { CapturedPokemon } from '../../trainer/types/trainer.types';
@@ -36,8 +39,8 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({ pokemon, onRelease }) =
       {pokemon.name}
     </Text>
     <Button
-      label="Liberar"
-      variant="outline"
+      label="🔓"
+      variant="muted"
       onPress={() => onRelease(pokemon.id)}
     />
   </Card>
@@ -45,8 +48,14 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({ pokemon, onRelease }) =
 
 export const TeamScreen: React.FC = () => {
   const { profile, captured, release } = useTrainerStore();
+  const [releasingId, setReleasingId] = useState<number | null>(null);
 
   const activeTeam = [...captured].reverse().slice(0, MAX_TEAM_SIZE);
+  const releasingPokemon = releasingId !== null
+    ? captured.find((c) => c.id === releasingId) ?? null
+    : null;
+  const typeColor = profile ? getTrainerTypeColor(profile.favoritePokemonType) : Colors.primary;
+  const typeTextColor = getTextColor(typeColor);
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -63,11 +72,11 @@ export const TeamScreen: React.FC = () => {
                 width={52}
                 height={52}
                 rounded={26}
-                bg="$primary"
                 items="center"
                 justify="center"
+                style={{ backgroundColor: typeColor }}
               >
-                <Text fontSize={22} fontWeight="800" color="$textLight">
+                <Text fontSize={22} fontWeight="800" style={{ color: typeTextColor }}>
                   {profile.fullName.charAt(0).toUpperCase()}
                 </Text>
               </YStack>
@@ -133,13 +142,26 @@ export const TeamScreen: React.FC = () => {
                 <TeamMemberCard
                   key={pokemon.id}
                   pokemon={pokemon}
-                  onRelease={release}
+                  onRelease={(id) => setReleasingId(id)}
                 />
               ))}
             </View>
           )}
         </YStack>
       </YStack>
+      <ReleaseModal
+        visible={releasingId !== null}
+        pokemonName={releasingPokemon?.name ?? ''}
+        context="team"
+        onConfirm={() => {
+          if (releasingId !== null) {
+            release(releasingId);
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          }
+          setReleasingId(null);
+        }}
+        onCancel={() => setReleasingId(null)}
+      />
     </ScrollView>
   );
 };

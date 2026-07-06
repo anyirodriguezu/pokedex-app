@@ -28,6 +28,12 @@ const BaseButton = styled(TamaguiButton, {
         borderColor: '$primary',
         color: '$primary',
       },
+      muted: {
+        bg: 'transparent',
+        borderWidth: 1.5,
+        borderColor: '#D4895A',
+        color: '#D4895A',
+      },
     },
   } as const,
 });
@@ -35,7 +41,7 @@ const BaseButton = styled(TamaguiButton, {
 interface ButtonProps {
   label: string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary' | 'outline';
+  variant?: 'primary' | 'secondary' | 'outline' | 'muted';
   loading?: boolean;
   disabled?: boolean;
 }
@@ -55,7 +61,7 @@ export const Button: React.FC<ButtonProps> = ({
       accessibilityRole="button"
       accessibilityLabel={loading ? 'Cargando' : label}
       accessibilityState={{ disabled: disabled || loading, busy: loading }}
-      icon={loading ? <ActivityIndicator testID="loading-indicator" color={variant === 'outline' ? Colors.primary : Colors.textLight} /> : undefined}
+      icon={loading ? <ActivityIndicator testID="loading-indicator" color={variant === 'muted' ? '#D4895A' : variant === 'outline' ? Colors.primary : Colors.textLight} /> : undefined}
     >
       {loading ? null : label}
     </BaseButton>

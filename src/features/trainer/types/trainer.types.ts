@@ -30,6 +30,7 @@ export interface TrainerStoreState {
   step1Data: Step1Data | null;
   isEditing: boolean;
   captured: CapturedPokemon[];
+  hasSeenSplash: boolean;
   setStep1Data: (data: Step1Data) => void;
   setStep2Data: (data: Step2Data) => void;
   setStarterPokemon: (pokemon: CapturedPokemon) => void;
@@ -38,5 +39,7 @@ export interface TrainerStoreState {
   startCreate: () => void;
   capture: (pokemon: CapturedPokemon) => void;
   release: (id: number) => void;
+  releaseStarterPokemon: () => void;
   isCaptured: (id: number) => boolean;
+  setHasSeenSplash: (value: boolean) => void;
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Image, StyleSheet } from 'react-native';
 import { Card, Separator, Text, XStack, YStack } from 'tamagui';
+import { getTrainerTypeColor, getTextColor } from '../../../utils/pokemonHelpers';
 import { TYPE_EMOJI } from '../constants/typeEmoji';
 import { TrainerProfile } from '../types/trainer.types';
 
@@ -27,6 +28,9 @@ const InfoRow: React.FC<{ label: string; value: string }> = ({ label, value }) =
 );
 
 export const TrainerCard: React.FC<TrainerCardProps> = ({ profile }) => {
+  const typeColor = getTrainerTypeColor(profile.favoritePokemonType);
+  const typeTextColor = getTextColor(typeColor);
+
   return (
     <Card bg="$surface" rounded={20} p="$5" elevation={4}>
       <XStack items="center" gap="$4" mb="$4">
@@ -34,11 +38,11 @@ export const TrainerCard: React.FC<TrainerCardProps> = ({ profile }) => {
           width={64}
           height={64}
           rounded={32}
-          bg="$primary"
           items="center"
           justify="center"
+          style={{ backgroundColor: typeColor }}
         >
-          <Text fontSize={28} fontWeight="800" color="$textLight">
+          <Text fontSize={28} fontWeight="800" style={{ color: typeTextColor }}>
             {profile.fullName.charAt(0).toUpperCase()}
           </Text>
         </YStack>
