@@ -6,12 +6,17 @@ import { StarterPokemonScreen } from '../features/trainer/screens/StarterPokemon
 import { SummaryScreen } from '../features/trainer/screens/SummaryScreen';
 import { Colors } from '../constants/colors';
 import { TrainerStackParamList } from './types';
+import { useTrainerStore } from '../store/trainerStore';
 
 const Stack = createNativeStackNavigator<TrainerStackParamList>();
 
 export const TrainerStack: React.FC = () => {
+  const profile = useTrainerStore((state) => state.profile);
+  const initialRoute: keyof TrainerStackParamList = profile ? 'Summary' : 'Step1PersonalData';
+
   return (
     <Stack.Navigator
+      initialRouteName={initialRoute}
       screenOptions={{
         headerStyle: { backgroundColor: Colors.primary },
         headerTintColor: Colors.textLight,

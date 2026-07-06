@@ -5,7 +5,7 @@ export type PokedexStackParamList = {
   PokemonDetail: { pokemonId: number; pokemonName: string };
 };
 
-export type WizardMode = 'create' | 'edit';
+export type WizardMode = 'create' | 'edit-basic' | 'edit-preferences';
 
 export type TrainerStackParamList = {
   Step1PersonalData: { mode?: WizardMode };

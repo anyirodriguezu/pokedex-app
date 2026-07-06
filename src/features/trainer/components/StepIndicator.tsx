@@ -1,6 +1,6 @@
 ﻿import React from 'react';
-import { StyleSheet, Text as RNText } from 'react-native';
-import { XStack, YStack } from 'tamagui';
+import { StyleSheet } from 'react-native';
+import { Text, XStack, YStack } from 'tamagui';
 import { Colors } from '../../../constants/colors';
 
 interface StepIndicatorProps {
@@ -35,14 +35,14 @@ export const StepIndicator: React.FC<StepIndicatorProps> = ({ currentStep, total
                   : 'Paso ' + step + ' pendiente'
               }
             >
-              <RNText
+              <Text
                 style={[
                   styles.stepLabel,
                   filled ? styles.stepLabelFilled : styles.stepLabelEmpty,
                 ]}
               >
                 {isCompleted ? '✓' : step}
-              </RNText>
+              </Text>
             </YStack>
             {step < totalSteps && (
               <YStack

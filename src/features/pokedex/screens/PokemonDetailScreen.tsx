@@ -1,30 +1,43 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as Haptics from 'expo-haptics';
-import React, { useEffect, useState } from 'react';
-import { ReleaseModal } from '../../../components/ui/ReleaseModal';
+import React, { useEffect, useRef, useState } from 'react';
 import { Image, ScrollView, StyleSheet, View } from 'react-native';
-import { ErrorState } from '../../../components/ui/ErrorState';
 import { Button } from '../../../components/ui/Button';
-import { PokedexStackParamList } from '../../../navigation/types';
-import { capitalize, getTypeColor, getTextColor } from '../../../utils/pokemonHelpers';
+import { ErrorState } from '../../../components/ui/ErrorState';
+import { ReleaseModal } from '../../../components/ui/ReleaseModal';
+import { TeamFullModal } from '../../../components/ui/TeamFullModal';
 import { Colors } from '../../../constants/colors';
+import { PokedexStackParamList } from '../../../navigation/types';
 import { useTrainerStore } from '../../../store/trainerStore';
+import { capitalize, getTypeColor, getTextColor } from '../../../utils/pokemonHelpers';
 import { Card, Text, XStack, YStack } from 'tamagui';
+import { CapturedAura } from '../components/CapturedAura';
 import { CaptureEffect } from '../components/CaptureEffect';
+import { ReleaseEffect } from '../components/ReleaseEffect';
 import { PokemonDetailSkeleton } from '../components/PokemonDetailSkeleton';
 import { PokemonStats } from '../components/PokemonStats';
 import { usePokemonDetail } from '../hooks/usePokemonDetail';
+import { MAX_ACTIVE_TEAM } from '../../../features/trainer/types/trainer.types';
 
 type Props = NativeStackScreenProps<PokedexStackParamList, 'PokemonDetail'>;
 
 export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   const { pokemonId } = route.params;
   const { data, isLoading, isError, refetch } = usePokemonDetail(pokemonId);
-  const { capture, release, captured } = useTrainerStore();
-  const isCaptured = captured.some((c) => c.id === pokemonId);
+  const { capture, captureToBox, release, swapPokemon, activeTeam, box, isCaptured: checkCaptured } =
+    useTrainerStore();
+
+  const isCaptured = checkCaptured(pokemonId);
+  const isInActiveTeam = activeTeam.some((c) => c.id === pokemonId);
 
   const [isCapturing, setIsCapturing] = useState(false);
+  const [isReleasing, setIsReleasing] = useState(false);
   const [showReleaseModal, setShowReleaseModal] = useState(false);
+  const [showTeamFullModal, setShowTeamFullModal] = useState(false);
+  const [pendingPokemon, setPendingPokemon] = useState<{
+    id: number; name: string; sprite: string;
+  } | null>(null);
+  const cancellingCaptureRef = useRef(false);
 
   useEffect(() => {
     if (!data) return;
@@ -60,21 +73,61 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   };
 
   const handleConfirmRelease = () => {
-    release(pokemonId);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setShowReleaseModal(false);
+    setIsReleasing(true);
+  };
+
+  const handleReleaseComplete = () => {
+    if (cancellingCaptureRef.current) {
+      cancellingCaptureRef.current = false;
+    } else {
+      release(pokemonId);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    }
+    setIsReleasing(false);
   };
 
   const handleCaptureComplete = () => {
-    if (imageUrl) {
-      capture({ id: data.id, name: capitalize(data.name), sprite: imageUrl });
+    if (!imageUrl) return;
+    const pokemon = { id: data.id, name: capitalize(data.name), sprite: imageUrl };
+
+    if (activeTeam.length >= MAX_ACTIVE_TEAM) {
+      setPendingPokemon(pokemon);
+      setIsCapturing(false);
+      setShowTeamFullModal(true);
+    } else {
+      capture(pokemon);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      setIsCapturing(false);
     }
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    setIsCapturing(false);
   };
+
+  const handleSendToBox = () => {
+    if (!pendingPokemon) return;
+    captureToBox(pendingPokemon);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setPendingPokemon(null);
+    setShowTeamFullModal(false);
+  };
+
+  const handleSwapWithTeam = (teamMemberId: number) => {
+    if (!pendingPokemon) return;
+    captureToBox(pendingPokemon);
+    swapPokemon(pendingPokemon.id, teamMemberId);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    setPendingPokemon(null);
+    setShowTeamFullModal(false);
+  };
+
+  const captureLabel = isCaptured
+    ? isInActiveTeam
+      ? '🔓 Liberar (Equipo)'
+      : '🔓 Liberar (Caja)'
+    : '🎯 Capturar';
 
   return (
     <View style={styles.wrapper}>
+      <CapturedAura visible={isCaptured} isInTeam={isInActiveTeam} />
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
         <YStack items="center" gap="$2">
           <Text fontSize={16} color="$textSecondary" fontWeight="500">
@@ -98,6 +151,18 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
               </YStack>
             ))}
           </XStack>
+          {isCaptured && (
+            <YStack
+              px="$3"
+              py="$1"
+              rounded={20}
+              style={{ backgroundColor: isInActiveTeam ? '#22C55E' : '#6366F1' }}
+            >
+              <Text fontSize={12} fontWeight="700" color="$textLight">
+                {isInActiveTeam ? '⚡ En tu equipo' : '📦 En tu Caja PC'}
+              </Text>
+            </YStack>
+          )}
         </YStack>
 
         {imageUrl && (
@@ -111,7 +176,7 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         )}
 
         <Button
-          label={isCaptured ? '🔓 Liberar' : '🎯 Capturar'}
+          label={captureLabel}
           variant={isCaptured ? 'muted' : 'primary'}
           onPress={handleCaptureToggle}
           loading={isCapturing}
@@ -139,6 +204,7 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
       </ScrollView>
 
       <CaptureEffect visible={isCapturing} onComplete={handleCaptureComplete} />
+      <ReleaseEffect visible={isReleasing} onComplete={handleReleaseComplete} />
 
       <ReleaseModal
         visible={showReleaseModal}
@@ -147,6 +213,20 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         onConfirm={handleConfirmRelease}
         onCancel={() => setShowReleaseModal(false)}
       />
+
+      <TeamFullModal
+        visible={showTeamFullModal}
+        newPokemon={pendingPokemon}
+        activeTeam={activeTeam}
+        onSendToBox={handleSendToBox}
+        onSwap={handleSwapWithTeam}
+        onCancel={() => {
+          setPendingPokemon(null);
+          setShowTeamFullModal(false);
+          cancellingCaptureRef.current = true;
+          setIsReleasing(true);
+        }}
+      />
     </View>
   );
 };
@@ -154,10 +234,11 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
+    backgroundColor: Colors.background,
   },
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: 'transparent',
   },
   content: {
     padding: 16,

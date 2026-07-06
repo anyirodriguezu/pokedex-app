@@ -2,6 +2,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as Haptics from 'expo-haptics';
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, ScrollView, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button } from '../../../components/ui/Button';
 import { ReleaseModal } from '../../../components/ui/ReleaseModal';
 import { Colors } from '../../../constants/colors';
@@ -13,9 +14,12 @@ import { Text, YStack } from 'tamagui';
 type Props = NativeStackScreenProps<TrainerStackParamList, 'Summary'>;
 
 export const SummaryScreen: React.FC<Props> = ({ navigation, route }) => {
-  const { profile, isEditing, startEdit, setStep1Data, resetProfile, releaseStarterPokemon } = useTrainerStore();
+  const { profile, isEditing, startEdit, setStep1Data, releaseStarterPokemon } =
+    useTrainerStore();
   const fromEdit = route.params?.fromEdit ?? false;
-  const toastOpacity = useRef(new Animated.Value(0)).current;
+  const insets = useSafeAreaInsets();
+  const bannerTranslateY = useRef(new Animated.Value(-80)).current;
+  const bannerOpacity = useRef(new Animated.Value(0)).current;
   const [showReleaseModal, setShowReleaseModal] = useState(false);
 
   useEffect(() => {
@@ -28,33 +32,42 @@ export const SummaryScreen: React.FC<Props> = ({ navigation, route }) => {
     if (fromEdit) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Animated.sequence([
-        Animated.timing(toastOpacity, { toValue: 1, duration: 200, useNativeDriver: true }),
-        Animated.delay(1800),
-        Animated.timing(toastOpacity, { toValue: 0, duration: 300, useNativeDriver: true }),
+        Animated.parallel([
+          Animated.timing(bannerTranslateY, { toValue: 0, duration: 350, useNativeDriver: true }),
+          Animated.timing(bannerOpacity, { toValue: 1, duration: 250, useNativeDriver: true }),
+        ]),
+        Animated.delay(2000),
+        Animated.parallel([
+          Animated.timing(bannerTranslateY, { toValue: -80, duration: 300, useNativeDriver: true }),
+          Animated.timing(bannerOpacity, { toValue: 0, duration: 250, useNativeDriver: true }),
+        ]),
       ]).start();
     }
-  }, [fromEdit, toastOpacity]);
+  }, [fromEdit, bannerTranslateY, bannerOpacity]);
 
-  const handleEditProfile = () => {
+  const handleEditBasic = () => {
     if (!profile) return;
     setStep1Data({ fullName: profile.fullName, age: profile.age, email: profile.email });
     startEdit();
-    navigation.navigate('Step1PersonalData', { mode: 'edit' });
+    navigation.navigate('Step1PersonalData', { mode: 'edit-basic' });
   };
 
-  const handleNewProfile = () => {
-    resetProfile();
+  const handleEditPreferences = () => {
+    if (!profile) return;
+    setStep1Data({ fullName: profile.fullName, age: profile.age, email: profile.email });
+    startEdit();
+    navigation.navigate('Step2Preferences', { mode: 'edit-preferences' });
   };
-
-  if (!profile) {
-    return null;
-  }
 
   const handleConfirmReleaseStarter = () => {
     releaseStarterPokemon();
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setShowReleaseModal(false);
   };
+
+  if (!profile) {
+    return null;
+  }
 
   return (
     <View style={styles.wrapper}>
@@ -70,7 +83,7 @@ export const SummaryScreen: React.FC<Props> = ({ navigation, route }) => {
           style={{ textAlign: 'center' }}
           accessibilityRole="header"
         >
-          ¡Registro completado! 🎉
+          Tu Tarjeta de Entrenador 🎖️
         </Text>
         <Text
           fontSize={15}
@@ -78,21 +91,25 @@ export const SummaryScreen: React.FC<Props> = ({ navigation, route }) => {
           style={{ textAlign: 'center' }}
           mt="$-2"
         >
-          Tu tarjeta de entrenador está lista
+          Gestiona tu perfil de aventurero
         </Text>
 
         <TrainerCard profile={profile} />
 
         <YStack gap="$3">
-          <Button label="Editar perfil" onPress={handleEditProfile} variant="outline" />
+          <Button label="✏️ Editar datos básicos" onPress={handleEditBasic} variant="outline" />
+          <Button
+            label="🎮 Editar preferencias"
+            onPress={handleEditPreferences}
+            variant="outline"
+          />
           {profile.starterPokemon && (
             <Button
-              label={`Liberar a ${profile.starterPokemon.name}`}
-              variant="outline"
+              label={`🔓 Liberar a ${profile.starterPokemon.name}`}
+              variant="secondary"
               onPress={() => setShowReleaseModal(true)}
             />
           )}
-          <Button label="Crear nuevo perfil" onPress={handleNewProfile} variant="secondary" />
         </YStack>
       </ScrollView>
 
@@ -104,10 +121,26 @@ export const SummaryScreen: React.FC<Props> = ({ navigation, route }) => {
         onCancel={() => setShowReleaseModal(false)}
       />
 
-      <Animated.View style={[styles.toast, { opacity: toastOpacity }]} pointerEvents="none">
-        <Text fontSize={14} fontWeight="600" color="$textLight">
-          ✅ Perfil actualizado correctamente
-        </Text>
+      <Animated.View
+        style={[
+          styles.banner,
+          {
+            top: insets.top + 8,
+            opacity: bannerOpacity,
+            transform: [{ translateY: bannerTranslateY }],
+          },
+        ]}
+        pointerEvents="none"
+      >
+        <Text fontSize={22}>✅</Text>
+        <YStack ml="$2" gap="$0.5">
+          <Text fontSize={14} fontWeight="700" color="$textLight">
+            Perfil actualizado
+          </Text>
+          <Text fontSize={12} fontWeight="400" color="$textLight" opacity={0.85}>
+            Los cambios se guardaron correctamente
+          </Text>
+        </YStack>
       </Animated.View>
     </View>
   );
@@ -126,17 +159,21 @@ const styles = StyleSheet.create({
     gap: 20,
     paddingBottom: 40,
   },
-  toast: {
+  banner: {
     position: 'absolute',
-    bottom: 32,
-    left: 20,
-    right: 20,
+    left: 16,
+    right: 16,
     backgroundColor: Colors.success,
-    borderRadius: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 20,
+    borderRadius: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
     alignItems: 'center',
     zIndex: 100,
-    elevation: 8,
+    elevation: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18,
+    shadowRadius: 8,
   },
 });

@@ -26,7 +26,9 @@ export const PokemonCard = React.memo(function PokemonCard({
   const imageUrl = getPokemonImageUrl(pokemon.id);
   const paddedId = String(pokemon.id).padStart(3, '0');
   const isCaptured = useTrainerStore(
-    (state) => state.captured.some((c) => c.id === pokemon.id)
+    (state) =>
+      state.activeTeam.some((c) => c.id === pokemon.id) ||
+      state.box.some((c) => c.id === pokemon.id)
   );
 
   return (

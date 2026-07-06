@@ -12,13 +12,14 @@ import { useTrainerStore } from '../../../store/trainerStore';
 import { FormField } from '../components/FormField';
 import { StepIndicator } from '../components/StepIndicator';
 import { step1Schema, Step1FormValues } from '../schemas/step1Schema';
-import { Text, YStack } from 'tamagui';
+import { Text, YStack, XStack } from 'tamagui';
 
 type Props = NativeStackScreenProps<TrainerStackParamList, 'Step1PersonalData'>;
 
 export const Step1PersonalDataScreen: React.FC<Props> = ({ navigation, route }) => {
   const mode = route.params?.mode ?? 'create';
-  const { setStep1Data, step1Data, isEditing } = useTrainerStore();
+  const isEditBasic = mode === 'edit-basic';
+  const { setStep1Data, setStep2Data, step1Data, isEditing, profile } = useTrainerStore();
   const scrollViewRef = useRef<ScrollView>(null);
 
   const {
@@ -50,12 +51,28 @@ export const Step1PersonalDataScreen: React.FC<Props> = ({ navigation, route }) 
 
   const onSubmit = (data: Step1FormValues) => {
     setStep1Data({ fullName: data.fullName, age: data.age, email: data.email });
-    navigation.navigate('Step2Preferences', { mode });
+
+    if (isEditBasic && profile) {
+      // Solo datos básicos: actualizar perfil y volver a Summary sin cambiar pokémon
+      setStep2Data({
+        district: profile.district,
+        favoritePokemonType: profile.favoritePokemonType,
+      });
+      navigation.navigate('Summary', { fromEdit: true });
+    } else {
+      navigation.navigate('Step2Preferences', { mode });
+    }
   };
 
   const onError = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
   };
+
+  const totalSteps = isEditBasic ? 1 : 3;
+  const title = isEditBasic ? 'Editar Datos Básicos' : 'Datos Personales';
+  const subtitle = isEditBasic
+    ? 'Actualiza tu nombre, edad o correo'
+    : 'Cuéntanos un poco sobre ti';
 
   return (
     <KeyboardAvoidingView
@@ -71,14 +88,14 @@ export const Step1PersonalDataScreen: React.FC<Props> = ({ navigation, route }) 
         showsVerticalScrollIndicator={false}
       >
         <YStack gap="$4">
-          <StepIndicator currentStep={1} totalSteps={3} />
+          <StepIndicator currentStep={1} totalSteps={totalSteps} />
 
           <YStack gap="$1">
             <Text fontSize={26} fontWeight="800" color="$appText">
-              Datos Personales
+              {title}
             </Text>
             <Text fontSize={15} color="$textSecondary">
-              Cuéntanos un poco sobre ti
+              {subtitle}
             </Text>
           </YStack>
 
@@ -136,7 +153,18 @@ export const Step1PersonalDataScreen: React.FC<Props> = ({ navigation, route }) 
             />
           </YStack>
 
-          <Button label="Siguiente" onPress={handleSubmit(onSubmit, onError)} />
+          {isEditBasic ? (
+            <XStack gap="$3">
+              <YStack flex={1}>
+                <Button label="Cancelar" onPress={() => navigation.goBack()} variant="outline" />
+              </YStack>
+              <YStack flex={1}>
+                <Button label="Guardar" onPress={handleSubmit(onSubmit, onError)} />
+              </YStack>
+            </XStack>
+          ) : (
+            <Button label="Siguiente" onPress={handleSubmit(onSubmit, onError)} />
+          )}
         </YStack>
       </ScrollView>
     </KeyboardAvoidingView>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text as RNText } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { Text, YStack } from 'tamagui';
 
 interface EmptyStateProps {
@@ -11,7 +11,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 }) => {
   return (
     <YStack flex={1} items="center" justify="center" p="$6" gap="$3">
-      <RNText style={styles.emoji}>📭</RNText>
+      <Text style={styles.emoji}>📭</Text>
       <Text fontSize={16} color="$textSecondary" style={{ textAlign: 'center' }}>
         {message}
       </Text>

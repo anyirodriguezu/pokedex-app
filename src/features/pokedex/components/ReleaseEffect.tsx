@@ -22,11 +22,12 @@ const DrawnPokeBallBottom: React.FC = () => (
   </View>
 );
 
-const COLORS = [
-  '#E3350D', '#F8D030', '#6890F0', '#78C850',
-  '#EE99AC', '#F08030', '#A040A0', '#98D8D8',
-  '#FF6B6B', '#FFE66D', '#4ECDC4', '#95E1D3',
+const COLD_COLORS = [
+  '#60A5FA', '#818CF8', '#A78BFA', '#C4B5FD',
+  '#93C5FD', '#E0F2FE', '#BAE6FD', '#7DD3FC',
+  '#6EE7F7', '#B2EBF2', '#A5B4FC', '#DDD6FE',
 ];
+
 const COUNT = 30;
 
 interface Particle {
@@ -49,25 +50,22 @@ function buildParticles(): Particle[] {
     rotate:  new Animated.Value(0),
     angle:    (i / COUNT) * Math.PI * 2,
     distance: 130 + (i % 6) * 30,
-    color:    COLORS[i % COLORS.length],
-    w: 8  + (i % 3) * 5,
-    h: 5  + (i % 2) * 4,
+    color:    COLD_COLORS[i % COLD_COLORS.length],
+    w: 7 + (i % 3) * 4,
+    h: 4 + (i % 2) * 4,
   }));
 }
 
-const T_SHOW  = 280;
-const T_CLOSE = 400;
-const T_ROCK  = 700;
-const T_FLASH = 160;
-const T_BURST = 750;
+const T_OPEN  = 300;
+const T_FLASH = 200;
+const T_BURST = 700;
 
 interface Props {
   visible:    boolean;
   onComplete: () => void;
-  label?:     string;
 }
 
-export const CaptureEffect: React.FC<Props> = ({ visible, onComplete, label = '¡Atrapado!' }) => {
+export const ReleaseEffect: React.FC<Props> = ({ visible, onComplete }) => {
   const { width, height } = useWindowDimensions();
   const cx = width  / 2;
   const cy = height / 2;
@@ -77,17 +75,15 @@ export const CaptureEffect: React.FC<Props> = ({ visible, onComplete, label = '�
   const ballOpacity  = useRef(new Animated.Value(0)).current;
   const topHalfY     = useRef(new Animated.Value(0)).current;
   const bottomHalfY  = useRef(new Animated.Value(0)).current;
-  const beamOpacity  = useRef(new Animated.Value(0)).current;
-  const ballRock     = useRef(new Animated.Value(0)).current;
   const flashOpacity = useRef(new Animated.Value(0)).current;
+  const beamOpacity  = useRef(new Animated.Value(0)).current;
+  const beamScale    = useRef(new Animated.Value(0)).current;
   const labelOpacity = useRef(new Animated.Value(0)).current;
   const labelScale   = useRef(new Animated.Value(0.3)).current;
   const ring1Scale   = useRef(new Animated.Value(0.3)).current;
   const ring1Opacity = useRef(new Animated.Value(0)).current;
   const ring2Scale   = useRef(new Animated.Value(0.3)).current;
   const ring2Opacity = useRef(new Animated.Value(0)).current;
-  const ring3Scale   = useRef(new Animated.Value(0.3)).current;
-  const ring3Opacity = useRef(new Animated.Value(0)).current;
   const particles    = useRef<Particle[]>(buildParticles()).current;
 
   useEffect(() => {
@@ -96,23 +92,19 @@ export const CaptureEffect: React.FC<Props> = ({ visible, onComplete, label = '�
     bgOpacity.setValue(0);
     ballScale.setValue(0);
     ballOpacity.setValue(0);
-    topHalfY.setValue(-HALF * 1.3);
-    bottomHalfY.setValue(HALF * 1.3);
-    beamOpacity.setValue(0);
-    ballRock.setValue(0);
+    topHalfY.setValue(0);
+    bottomHalfY.setValue(0);
     flashOpacity.setValue(0);
+    beamOpacity.setValue(0);
+    beamScale.setValue(0);
     labelOpacity.setValue(0);
     labelScale.setValue(0.3);
     ring1Scale.setValue(0.3); ring1Opacity.setValue(0);
     ring2Scale.setValue(0.3); ring2Opacity.setValue(0);
-    ring3Scale.setValue(0.3); ring3Opacity.setValue(0);
     particles.forEach((p) => {
       p.tx.setValue(0); p.ty.setValue(0);
       p.opacity.setValue(0); p.rotate.setValue(0);
     });
-
-    const rock = (v: number, ms: number) =>
-      Animated.timing(ballRock, { toValue: v, duration: ms, useNativeDriver: true });
 
     const makeRing = (scale: Animated.Value, opacity: Animated.Value, delay: number) =>
       Animated.sequence([
@@ -120,52 +112,40 @@ export const CaptureEffect: React.FC<Props> = ({ visible, onComplete, label = '�
         Animated.parallel([
           Animated.timing(scale,   { toValue: 4.2, duration: 620, useNativeDriver: true }),
           Animated.sequence([
-            Animated.timing(opacity, { toValue: 0.8, duration: 1,   useNativeDriver: true }),
-            Animated.timing(opacity, { toValue: 0,   duration: 619, useNativeDriver: true }),
+            Animated.timing(opacity, { toValue: 0.75, duration: 1,   useNativeDriver: true }),
+            Animated.timing(opacity, { toValue: 0,    duration: 619, useNativeDriver: true }),
           ]),
         ]),
       ]);
 
     Animated.sequence([
-      // Fase 1 — overlay oscuro + pokébola abierta aparece
+      // Fase 1 — overlay oscuro + pokébola aparece
       Animated.parallel([
-        Animated.timing(bgOpacity,   { toValue: 0.55, duration: T_SHOW, useNativeDriver: true }),
+        Animated.timing(bgOpacity,   { toValue: 0.55, duration: T_OPEN * 0.6, useNativeDriver: true }),
+        Animated.timing(ballScale,   { toValue: 1,    duration: T_OPEN * 0.6, useNativeDriver: true }),
+        Animated.timing(ballOpacity, { toValue: 1,    duration: T_OPEN * 0.6, useNativeDriver: true }),
+      ]),
+
+      // Fase 2 — pokébola se abre + rayo de luz + anillo 1
+      Animated.parallel([
+        Animated.timing(topHalfY,    { toValue: -HALF * 1.2, duration: T_OPEN, useNativeDriver: true }),
+        Animated.timing(bottomHalfY, { toValue:  HALF * 1.2, duration: T_OPEN, useNativeDriver: true }),
         Animated.sequence([
-          Animated.parallel([
-            Animated.timing(ballScale,   { toValue: 1.15, duration: T_SHOW * 0.65, useNativeDriver: true }),
-            Animated.timing(ballOpacity, { toValue: 1,    duration: T_SHOW * 0.5,  useNativeDriver: true }),
-            Animated.timing(beamOpacity, { toValue: 1,    duration: T_SHOW * 0.5,  useNativeDriver: true }),
-          ]),
-          Animated.timing(ballScale, { toValue: 1.0, duration: T_SHOW * 0.35, useNativeDriver: true }),
-        ]),
-      ]),
-
-      // Fase 2 — pokébola se cierra (el Pokémon es atrapado)
-      Animated.parallel([
-        Animated.timing(topHalfY,    { toValue: 0, duration: T_CLOSE, useNativeDriver: true }),
-        Animated.timing(bottomHalfY, { toValue: 0, duration: T_CLOSE, useNativeDriver: true }),
-        Animated.timing(beamOpacity, { toValue: 0, duration: T_CLOSE * 0.55, useNativeDriver: true }),
-      ]),
-
-      // Fase 3 — balanceo (el Pokémon lucha dentro)
-      Animated.sequence([
-        rock( 0.30, 110), rock(-0.30, 110),
-        rock( 0.22, 100), rock(-0.22, 100),
-        rock( 0.12,  90), rock(-0.12,  90),
-        rock(    0,  70),
-      ]),
-
-      // Fase 4 — doble destello + 3 anillos + label
-      Animated.parallel([
-        Animated.sequence([
-          Animated.timing(flashOpacity, { toValue: 0.9,  duration: T_FLASH / 2, useNativeDriver: true }),
-          Animated.timing(flashOpacity, { toValue: 0.25, duration: T_FLASH / 2, useNativeDriver: true }),
-          Animated.timing(flashOpacity, { toValue: 0.75, duration: T_FLASH / 2, useNativeDriver: true }),
-          Animated.timing(flashOpacity, { toValue: 0,    duration: T_FLASH / 2, useNativeDriver: true }),
+          Animated.timing(beamOpacity, { toValue: 1, duration: T_OPEN * 0.4, useNativeDriver: true }),
+          Animated.timing(beamScale,   { toValue: 1, duration: T_OPEN * 0.6, useNativeDriver: true }),
         ]),
         makeRing(ring1Scale, ring1Opacity, 0),
-        makeRing(ring2Scale, ring2Opacity, 110),
-        makeRing(ring3Scale, ring3Opacity, 220),
+      ]),
+
+      // Fase 3 — doble destello + anillo 2 + label
+      Animated.parallel([
+        Animated.sequence([
+          Animated.timing(flashOpacity, { toValue: 0.85, duration: T_FLASH / 2, useNativeDriver: true }),
+          Animated.timing(flashOpacity, { toValue: 0.2,  duration: T_FLASH / 2, useNativeDriver: true }),
+          Animated.timing(flashOpacity, { toValue: 0.65, duration: T_FLASH / 2, useNativeDriver: true }),
+          Animated.timing(flashOpacity, { toValue: 0,    duration: T_FLASH / 2, useNativeDriver: true }),
+        ]),
+        makeRing(ring2Scale, ring2Opacity, 0),
         Animated.sequence([
           Animated.parallel([
             Animated.timing(labelOpacity, { toValue: 1,    duration: 160, useNativeDriver: true }),
@@ -175,12 +155,12 @@ export const CaptureEffect: React.FC<Props> = ({ visible, onComplete, label = '�
         ]),
       ]),
 
-      // Fase 5 — confeti + pokébola y overlay desaparecen
+      // Fase 4 — partículas 360° + todo desaparece
       Animated.parallel([
-        Animated.timing(bgOpacity,    { toValue: 0,   duration: T_BURST,        useNativeDriver: true }),
-        Animated.timing(ballOpacity,  { toValue: 0,   duration: T_BURST * 0.45, useNativeDriver: true }),
-        Animated.timing(ballScale,    { toValue: 1.4, duration: T_BURST * 0.45, useNativeDriver: true }),
-        Animated.timing(labelOpacity, { toValue: 0,   duration: T_BURST * 0.65, useNativeDriver: true }),
+        Animated.timing(bgOpacity,    { toValue: 0, duration: T_BURST,        useNativeDriver: true }),
+        Animated.timing(ballOpacity,  { toValue: 0, duration: T_BURST * 0.4,  useNativeDriver: true }),
+        Animated.timing(beamOpacity,  { toValue: 0, duration: T_BURST * 0.4,  useNativeDriver: true }),
+        Animated.timing(labelOpacity, { toValue: 0, duration: T_BURST * 0.65, useNativeDriver: true }),
         ...particles.map((p) =>
           Animated.sequence([
             Animated.timing(p.opacity, { toValue: 1, duration: 1, useNativeDriver: true }),
@@ -188,7 +168,7 @@ export const CaptureEffect: React.FC<Props> = ({ visible, onComplete, label = '�
               Animated.timing(p.tx,      { toValue: Math.cos(p.angle) * p.distance, duration: T_BURST, useNativeDriver: true }),
               Animated.timing(p.ty,      { toValue: Math.sin(p.angle) * p.distance, duration: T_BURST, useNativeDriver: true }),
               Animated.timing(p.opacity, { toValue: 0, duration: T_BURST, useNativeDriver: true }),
-              Animated.timing(p.rotate,  { toValue: 5, duration: T_BURST, useNativeDriver: true }),
+              Animated.timing(p.rotate,  { toValue: 4, duration: T_BURST, useNativeDriver: true }),
             ]),
           ])
         ),
@@ -200,19 +180,63 @@ export const CaptureEffect: React.FC<Props> = ({ visible, onComplete, label = '�
 
   if (!visible) return null;
 
-  const rockRotate = ballRock.interpolate({
-    inputRange:  [-1, 0, 1],
-    outputRange: ['-45deg', '0deg', '45deg'],
-  });
-
   return (
     <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
       {/* Overlay oscuro */}
       <Animated.View style={[StyleSheet.absoluteFillObject, { backgroundColor: '#000', opacity: bgOpacity }]} />
 
-      {/* Partículas de confeti */}
+      {/* Rayo de luz */}
+      <Animated.View
+        style={{
+          position:  'absolute',
+          left:      cx - 30,
+          top:       cy - HALF,
+          width:     60,
+          height:    HALF * 2,
+          opacity:   beamOpacity,
+          transform: [{ scaleY: beamScale }],
+          backgroundColor: 'transparent',
+          overflow: 'hidden',
+        }}
+      >
+        <View style={styles.beam} />
+      </Animated.View>
+
+      {/* Mitad superior de la pokébola */}
+      <Animated.View
+        style={{
+          position: 'absolute',
+          left:     cx - BALL_SIZE / 2,
+          top:      cy - BALL_SIZE / 2,
+          width:    BALL_SIZE,
+          height:   HALF,
+          overflow: 'hidden',
+          opacity:  ballOpacity,
+          transform: [{ scale: ballScale }, { translateY: topHalfY }],
+        }}
+      >
+        <DrawnPokeBallTop />
+      </Animated.View>
+
+      {/* Mitad inferior de la pokébola */}
+      <Animated.View
+        style={{
+          position: 'absolute',
+          left:     cx - BALL_SIZE / 2,
+          top:      cy,
+          width:    BALL_SIZE,
+          height:   HALF,
+          overflow: 'hidden',
+          opacity:  ballOpacity,
+          transform: [{ scale: ballScale }, { translateY: bottomHalfY }],
+        }}
+      >
+        <DrawnPokeBallBottom />
+      </Animated.View>
+
+      {/* Partículas 360° */}
       {particles.map((p, i) => {
-        const rotate = p.rotate.interpolate({ inputRange: [0, 5], outputRange: ['0deg', '1800deg'] });
+        const rotate = p.rotate.interpolate({ inputRange: [0, 4], outputRange: ['0deg', '1440deg'] });
         return (
           <Animated.View
             key={i}
@@ -233,9 +257,8 @@ export const CaptureEffect: React.FC<Props> = ({ visible, onComplete, label = '�
 
       {/* Anillos de onda expansiva */}
       {([
-        { scale: ring1Scale, opacity: ring1Opacity, color: '#E3350D' },
-        { scale: ring2Scale, opacity: ring2Opacity, color: '#F8D030' },
-        { scale: ring3Scale, opacity: ring3Opacity, color: '#FFFFFF' },
+        { scale: ring1Scale, opacity: ring1Opacity, color: '#60A5FA' },
+        { scale: ring2Scale, opacity: ring2Opacity, color: '#E0F9FF' },
       ] as const).map((ring, i) => (
         <Animated.View
           key={`ring-${i}`}
@@ -254,66 +277,7 @@ export const CaptureEffect: React.FC<Props> = ({ visible, onComplete, label = '�
         />
       ))}
 
-      {/* Rayo de luz (visible mientras la pokébola está abierta) */}
-      <Animated.View
-        style={{
-          position:  'absolute',
-          left:      cx - 30,
-          top:       cy - HALF,
-          width:     60,
-          height:    HALF * 2,
-          opacity:   beamOpacity,
-          backgroundColor: 'transparent',
-          overflow: 'hidden',
-        }}
-      >
-        <View style={styles.beam} />
-      </Animated.View>
-
-      {/* Pokébola — wrapper para escala + balanceo, mitades con translateY para abrir/cerrar */}
-      <Animated.View
-        style={{
-          position: 'absolute',
-          left:     cx - BALL_SIZE / 2,
-          top:      cy - BALL_SIZE / 2,
-          width:    BALL_SIZE,
-          height:   BALL_SIZE,
-          opacity:  ballOpacity,
-          transform: [{ scale: ballScale }, { rotate: rockRotate }],
-        }}
-      >
-        {/* Mitad superior */}
-        <Animated.View
-          style={{
-            position: 'absolute',
-            top:      0,
-            left:     0,
-            width:    BALL_SIZE,
-            height:   HALF,
-            overflow: 'hidden',
-            transform: [{ translateY: topHalfY }],
-          }}
-        >
-          <DrawnPokeBallTop />
-        </Animated.View>
-
-        {/* Mitad inferior */}
-        <Animated.View
-          style={{
-            position: 'absolute',
-            top:      HALF,
-            left:     0,
-            width:    BALL_SIZE,
-            height:   HALF,
-            overflow: 'hidden',
-            transform: [{ translateY: bottomHalfY }],
-          }}
-        >
-          <DrawnPokeBallBottom />
-        </Animated.View>
-      </Animated.View>
-
-      {/* Label "¡Atrapado!" */}
+      {/* Label "¡Liberado!" */}
       <Animated.View
         style={{
           position: 'absolute',
@@ -325,12 +289,12 @@ export const CaptureEffect: React.FC<Props> = ({ visible, onComplete, label = '�
           transform: [{ scale: labelScale }],
         }}
       >
-        <Text style={styles.captureLabel}>{label}</Text>
+        <Text style={styles.releaseLabel}>¡Liberado!</Text>
       </Animated.View>
 
-      {/* Destello blanco */}
+      {/* Flash azul-blanco */}
       <Animated.View
-        style={[StyleSheet.absoluteFillObject, { backgroundColor: '#fff', opacity: flashOpacity }]}
+        style={[StyleSheet.absoluteFillObject, { backgroundColor: '#BAE6FD', opacity: flashOpacity }]}
       />
     </View>
   );
@@ -389,18 +353,18 @@ const styles = StyleSheet.create({
   },
   beam: {
     flex:            1,
-    backgroundColor: '#FFE0B2',
-    opacity:         0.9,
+    backgroundColor: '#E0F9FF',
+    opacity:         0.95,
     borderRadius:    30,
     marginHorizontal: 6,
   },
-  captureLabel: {
+  releaseLabel: {
     fontSize:         38,
     fontWeight:       '900',
-    color:            '#FFD700',
-    textShadowColor:  '#B22A00',
+    color:            '#E0F9FF',
+    textShadowColor:  '#2563EB',
     textShadowOffset: { width: 0, height: 3 },
-    textShadowRadius: 10,
+    textShadowRadius: 12,
     letterSpacing:    1,
   },
 });

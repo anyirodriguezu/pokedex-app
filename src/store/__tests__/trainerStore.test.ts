@@ -12,7 +12,14 @@ const buildProfile = () => {
 };
 
 beforeEach(() => {
-  useTrainerStore.setState({ profile: null, step1Data: null, isEditing: false, captured: [], hasSeenSplash: false });
+  useTrainerStore.setState({
+    profile: null,
+    step1Data: null,
+    isEditing: false,
+    activeTeam: [],
+    box: [],
+    hasSeenSplash: false,
+  });
 });
 
 describe('estado inicial', () => {
@@ -107,53 +114,35 @@ describe('startCreate', () => {
 });
 
 describe('capture', () => {
-  it('agrega un Pokémon a captured', () => {
+  it('agrega un Pokémon al activeTeam si hay espacio', () => {
     useTrainerStore.getState().capture(pikachuMock);
-    expect(useTrainerStore.getState().captured).toHaveLength(1);
-    expect(useTrainerStore.getState().captured[0]).toEqual(pikachuMock);
+    expect(useTrainerStore.getState().activeTeam).toHaveLength(1);
+    expect(useTrainerStore.getState().activeTeam[0]).toEqual(pikachuMock);
   });
 
   it('no duplica un Pokémon ya capturado', () => {
     useTrainerStore.getState().capture(pikachuMock);
     useTrainerStore.getState().capture(pikachuMock);
-    expect(useTrainerStore.getState().captured).toHaveLength(1);
+    const { activeTeam, box } = useTrainerStore.getState();
+    expect(activeTeam.length + box.length).toBe(1);
   });
 
   it('permite capturar varios Pokémon distintos', () => {
     useTrainerStore.getState().capture(pikachuMock);
     useTrainerStore.getState().capture(charmanderMock);
-    expect(useTrainerStore.getState().captured).toHaveLength(2);
-  });
-});
-
-describe('release', () => {
-  it('elimina el Pokémon con el id dado', () => {
-    useTrainerStore.getState().capture(pikachuMock);
-    useTrainerStore.getState().capture(charmanderMock);
-
-    useTrainerStore.getState().release(25);
-
-    const captured = useTrainerStore.getState().captured;
-    expect(captured).toHaveLength(1);
-    expect(captured[0].id).toBe(4);
-  });
-
-  it('no lanza error si el id no existe en captured', () => {
-    useTrainerStore.getState().capture(pikachuMock);
-    expect(() => useTrainerStore.getState().release(999)).not.toThrow();
-    expect(useTrainerStore.getState().captured).toHaveLength(1);
-  });
-
-  it('deja captured vacío al liberar el único Pokémon', () => {
-    useTrainerStore.getState().capture(pikachuMock);
-    useTrainerStore.getState().release(25);
-    expect(useTrainerStore.getState().captured).toHaveLength(0);
+    const { activeTeam } = useTrainerStore.getState();
+    expect(activeTeam).toHaveLength(2);
   });
 });
 
 describe('isCaptured', () => {
-  it('retorna true para un Pokémon capturado', () => {
+  it('retorna true para un Pokémon en activeTeam', () => {
     useTrainerStore.getState().capture(pikachuMock);
+    expect(useTrainerStore.getState().isCaptured(25)).toBe(true);
+  });
+
+  it('retorna true para un Pokémon en box', () => {
+    useTrainerStore.getState().captureToBox(pikachuMock);
     expect(useTrainerStore.getState().isCaptured(25)).toBe(true);
   });
 
@@ -165,6 +154,55 @@ describe('isCaptured', () => {
     useTrainerStore.getState().capture(pikachuMock);
     useTrainerStore.getState().release(25);
     expect(useTrainerStore.getState().isCaptured(25)).toBe(false);
+  });
+});
+
+describe('release', () => {
+  it('elimina el Pokémon del activeTeam', () => {
+    useTrainerStore.getState().capture(pikachuMock);
+    useTrainerStore.getState().capture(charmanderMock);
+
+    useTrainerStore.getState().release(25);
+
+    const { activeTeam } = useTrainerStore.getState();
+    expect(activeTeam).toHaveLength(1);
+    expect(activeTeam[0].id).toBe(4);
+  });
+
+  it('elimina el Pokémon del box', () => {
+    useTrainerStore.getState().captureToBox(pikachuMock);
+    useTrainerStore.getState().release(25);
+    expect(useTrainerStore.getState().box).toHaveLength(0);
+  });
+
+  it('no lanza error si el id no existe', () => {
+    useTrainerStore.getState().capture(pikachuMock);
+    expect(() => useTrainerStore.getState().release(999)).not.toThrow();
+    expect(useTrainerStore.getState().activeTeam).toHaveLength(1);
+  });
+});
+
+describe('moveToTeam / moveToBox / swapPokemon', () => {
+  it('mueve un pokémon de box a activeTeam', () => {
+    useTrainerStore.getState().captureToBox(pikachuMock);
+    useTrainerStore.getState().moveToTeam(25);
+    expect(useTrainerStore.getState().activeTeam).toHaveLength(1);
+    expect(useTrainerStore.getState().box).toHaveLength(0);
+  });
+
+  it('mueve un pokémon de activeTeam a box', () => {
+    useTrainerStore.getState().capture(pikachuMock);
+    useTrainerStore.getState().moveToBox(25);
+    expect(useTrainerStore.getState().activeTeam).toHaveLength(0);
+    expect(useTrainerStore.getState().box).toHaveLength(1);
+  });
+
+  it('intercambia pokémon entre box y activeTeam', () => {
+    useTrainerStore.getState().capture(pikachuMock);
+    useTrainerStore.getState().captureToBox(charmanderMock);
+    useTrainerStore.getState().swapPokemon(4, 25);
+    expect(useTrainerStore.getState().activeTeam[0].id).toBe(4);
+    expect(useTrainerStore.getState().box[0].id).toBe(25);
   });
 });
 

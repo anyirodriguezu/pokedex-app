@@ -7,6 +7,7 @@ import {
   Step2Data,
   TrainerProfile,
   CapturedPokemon,
+  MAX_ACTIVE_TEAM,
 } from '../features/trainer/types/trainer.types';
 
 export const useTrainerStore = create<TrainerStoreState>()(
@@ -15,7 +16,8 @@ export const useTrainerStore = create<TrainerStoreState>()(
       profile: null,
       step1Data: null,
       isEditing: false,
-      captured: [],
+      activeTeam: [],
+      box: [],
       hasSeenSplash: false,
 
       setStep1Data: (data: Step1Data) => {
@@ -57,13 +59,33 @@ export const useTrainerStore = create<TrainerStoreState>()(
       },
 
       capture: (pokemon: CapturedPokemon) => {
-        const captured = get().captured;
-        if (captured.some((c) => c.id === pokemon.id)) return;
-        set({ captured: [...captured, pokemon] });
+        const { activeTeam, box } = get();
+        const alreadyCaptured =
+          activeTeam.some((c) => c.id === pokemon.id) ||
+          box.some((c) => c.id === pokemon.id);
+        if (alreadyCaptured) return;
+
+        if (activeTeam.length < MAX_ACTIVE_TEAM) {
+          set({ activeTeam: [...activeTeam, pokemon] });
+        } else {
+          set({ box: [...box, pokemon] });
+        }
+      },
+
+      captureToBox: (pokemon: CapturedPokemon) => {
+        const { activeTeam, box } = get();
+        const alreadyCaptured =
+          activeTeam.some((c) => c.id === pokemon.id) ||
+          box.some((c) => c.id === pokemon.id);
+        if (alreadyCaptured) return;
+        set({ box: [...box, pokemon] });
       },
 
       release: (id: number) => {
-        set({ captured: get().captured.filter((c) => c.id !== id) });
+        set({
+          activeTeam: get().activeTeam.filter((c) => c.id !== id),
+          box: get().box.filter((c) => c.id !== id),
+        });
       },
 
       releaseStarterPokemon: () => {
@@ -72,12 +94,53 @@ export const useTrainerStore = create<TrainerStoreState>()(
         set({ profile: { ...profile, starterPokemon: null } });
       },
 
-      isCaptured: (id: number) => get().captured.some((c) => c.id === id),
+      isCaptured: (id: number) => {
+        const { activeTeam, box } = get();
+        return activeTeam.some((c) => c.id === id) || box.some((c) => c.id === id);
+      },
+
+      isInActiveTeam: (id: number) => get().activeTeam.some((c) => c.id === id),
+
+      moveToTeam: (id: number) => {
+        const { activeTeam, box } = get();
+        if (activeTeam.length >= MAX_ACTIVE_TEAM) return;
+        const pokemon = box.find((c) => c.id === id);
+        if (!pokemon) return;
+        set({
+          activeTeam: [...activeTeam, pokemon],
+          box: box.filter((c) => c.id !== id),
+        });
+      },
+
+      moveToBox: (id: number) => {
+        const { activeTeam, box } = get();
+        const pokemon = activeTeam.find((c) => c.id === id);
+        if (!pokemon) return;
+        set({
+          activeTeam: activeTeam.filter((c) => c.id !== id),
+          box: [...box, pokemon],
+        });
+      },
+
+      swapPokemon: (boxId: number, teamId: number) => {
+        const { activeTeam, box } = get();
+        const boxPokemon = box.find((c) => c.id === boxId);
+        const teamPokemon = activeTeam.find((c) => c.id === teamId);
+        if (!boxPokemon || !teamPokemon) return;
+        set({
+          activeTeam: activeTeam.map((c) => (c.id === teamId ? boxPokemon : c)),
+          box: box.map((c) => (c.id === boxId ? teamPokemon : c)),
+        });
+      },
     }),
     {
       name: 'trainer-storage',
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: (state) => ({ profile: state.profile, captured: state.captured }),
+      partialize: (state) => ({
+        profile: state.profile,
+        activeTeam: state.activeTeam,
+        box: state.box,
+      }),
     }
   )
 );

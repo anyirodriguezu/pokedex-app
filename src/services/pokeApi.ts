@@ -24,3 +24,12 @@ export async function fetchPokemonByType(typeName: string): Promise<PokemonTypeR
   if (!response.ok) throw new Error('Error al obtener Pokémon por tipo');
   return response.json();
 }
+
+export async function fetchPokemonRange(
+  offset: number,
+  limit: number
+): Promise<PokemonListResponse> {
+  const response = await fetch(`${API_BASE_URL}/pokemon?offset=${offset}&limit=${limit}`);
+  if (!response.ok) throw new Error('Error al obtener Pokémon por rango');
+  return response.json();
+}
