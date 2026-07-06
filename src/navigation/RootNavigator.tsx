@@ -1,16 +1,75 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import React from 'react';
-import { StyleSheet } from 'react-native';
-import { Text } from 'tamagui';
+import React, { useEffect, useRef } from 'react';
+import { Dimensions, PanResponder, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Text } from 'tamagui';
 import { Colors } from '../constants/colors';
-import { TeamScreen } from '../features/team/screens/TeamScreen';
 import { useTrainerStore } from '../store/trainerStore';
 import { PokedexStack } from './PokedexStack';
+import { TeamStack } from './TeamStack';
 import { TrainerStack } from './TrainerStack';
 import { RootTabParamList } from './types';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
+
+const TAB_ORDER: Array<keyof RootTabParamList> = ['Pokedex', 'Team', 'Trainer'];
+
+const EDGE_ZONE = 32;
+
+function makeSwipeWrapper<P extends object>(
+  WrappedComponent: React.ComponentType<P>,
+  tabIndex: number,
+): React.ComponentType<P> {
+  const SwipeWrapper: React.FC<P & { navigation: any }> = (props) => {
+    const navRef = useRef(props.navigation);
+    useEffect(() => { navRef.current = props.navigation; }, [props.navigation]);
+
+    const pan = useRef(
+      PanResponder.create({
+        // Capture before children (FlatList, ScrollView) only when the gesture
+        // starts at a screen edge and is clearly horizontal.
+        onMoveShouldSetPanResponderCapture: (_, gs) => {
+          const { width } = Dimensions.get('window');
+          const startedAtLeft  = gs.x0 < EDGE_ZONE;
+          const startedAtRight = gs.x0 > width - EDGE_ZONE;
+          const isHorizontal   = Math.abs(gs.dx) > 10 && Math.abs(gs.dx) > Math.abs(gs.dy) * 2;
+          return (startedAtLeft || startedAtRight) && isHorizontal;
+        },
+        onPanResponderTerminationRequest: () => true,
+        onPanResponderRelease: (_, gs) => {
+          const isFastSwipe  = Math.abs(gs.vx) > 0.3;
+          const isLongSwipe  = Math.abs(gs.dx) > 50;
+          const isHorizontal = Math.abs(gs.dx) > Math.abs(gs.dy) * 1.5;
+          if ((!isFastSwipe && !isLongSwipe) || !isHorizontal) return;
+
+          if (gs.dx < 0 && tabIndex < TAB_ORDER.length - 1) {
+            const next = TAB_ORDER[tabIndex + 1];
+            if (next === 'Trainer') {
+              const { step1Data, isEditing } = useTrainerStore.getState();
+              if (!step1Data && !isEditing) useTrainerStore.getState().startCreate();
+            }
+            navRef.current.navigate(next);
+          } else if (gs.dx > 0 && tabIndex > 0) {
+            navRef.current.navigate(TAB_ORDER[tabIndex - 1]);
+          }
+        },
+      })
+    ).current;
+
+    return (
+      <View style={{ flex: 1 }} {...pan.panHandlers}>
+        <WrappedComponent {...props} />
+      </View>
+    );
+  };
+  return SwipeWrapper as React.ComponentType<P>;
+}
+
+const PokedexSwipeable = makeSwipeWrapper(PokedexStack, 0);
+const TeamSwipeable    = makeSwipeWrapper(TeamStack,    1);
+const TrainerSwipeable = makeSwipeWrapper(TrainerStack, 2);
+
+// ── Tab icon ───────────────────────────────────────────────────────────────
 
 interface TabIconProps {
   emoji: string;
@@ -27,6 +86,8 @@ const TabIcon: React.FC<TabIconProps> = ({ emoji, focused, accessibilityLabel })
     {emoji}
   </Text>
 );
+
+// ── Navigator ─────────────────────────────────────────────────────────────
 
 export const RootNavigator: React.FC = () => {
   const insets = useSafeAreaInsets();
@@ -50,7 +111,7 @@ export const RootNavigator: React.FC = () => {
     >
       <Tab.Screen
         name="Pokedex"
-        component={PokedexStack}
+        component={PokedexSwipeable}
         options={{
           tabBarLabel: 'Pokédex',
           tabBarIcon: ({ focused }) => (
@@ -65,13 +126,8 @@ export const RootNavigator: React.FC = () => {
       />
       <Tab.Screen
         name="Team"
-        component={TeamScreen}
+        component={TeamSwipeable}
         options={{
-          headerShown: true,
-          headerStyle: { backgroundColor: Colors.primary },
-          headerTintColor: Colors.textLight,
-          headerTitleStyle: { fontWeight: '700' },
-          headerTitle: 'Mi Equipo',
           tabBarLabel: 'Mi Equipo',
           tabBarIcon: ({ focused }) => (
             <TabIcon emoji="⚡" focused={focused} accessibilityLabel="Mi Equipo" />
@@ -80,7 +136,7 @@ export const RootNavigator: React.FC = () => {
       />
       <Tab.Screen
         name="Trainer"
-        component={TrainerStack}
+        component={TrainerSwipeable}
         options={{
           tabBarLabel: 'Entrenador',
           tabBarIcon: ({ focused }) => (
@@ -101,8 +157,8 @@ export const RootNavigator: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  tabIcon: { opacity: 1 },
-  tabIconFocused: { fontSize: 26, opacity: 1 },
-  tabIconUnfocused: { fontSize: 22, opacity: 0.6 },
-  tabLabel: { fontSize: 12, fontWeight: '600', marginBottom: 4 },
+  tabIcon:         { opacity: 1 },
+  tabIconFocused:  { fontSize: 26, opacity: 1 },
+  tabIconUnfocused:{ fontSize: 22, opacity: 0.6 },
+  tabLabel:        { fontSize: 12, fontWeight: '600', marginBottom: 4 },
 });

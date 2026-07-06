@@ -14,8 +14,12 @@ export type TrainerStackParamList = {
   Summary: { fromEdit?: boolean };
 };
 
+export type TeamStackParamList = {
+  TeamMain: undefined;
+};
+
 export type RootTabParamList = {
   Pokedex: NavigatorScreenParams<PokedexStackParamList>;
   Trainer: NavigatorScreenParams<TrainerStackParamList>;
-  Team: undefined;
+  Team: NavigatorScreenParams<TeamStackParamList>;
 };

@@ -13,6 +13,7 @@ import { capitalize, getTypeColor, getTextColor } from '../../../utils/pokemonHe
 import { Card, Text, XStack, YStack } from 'tamagui';
 import { CapturedAura } from '../components/CapturedAura';
 import { CaptureEffect } from '../components/CaptureEffect';
+import { EscapeEffect } from '../components/EscapeEffect';
 import { PokemonEvolutionChain } from '../components/PokemonEvolutionChain';
 import { PokemonDetailSkeleton } from '../components/PokemonDetailSkeleton';
 import { PokemonStats } from '../components/PokemonStats';
@@ -58,6 +59,15 @@ function formatCaptureRate(rate: number) {
   if (rate >= 45)  return { label: 'Normal',     color: '#F59E0B' };
   if (rate >= 10)  return { label: 'Difícil',    color: '#F97316' };
   return                  { label: 'Muy difícil',color: '#EF4444' };
+}
+
+// Escape probability scales with difficulty — legendary Pokémon fight harder
+function getEscapeChance(captureRate: number): number {
+  if (captureRate >= 200) return 0.03;
+  if (captureRate >= 100) return 0.08;
+  if (captureRate >= 45)  return 0.13;
+  if (captureRate >= 10)  return 0.22;
+  return 0.35;
 }
 
 const EGG_GROUP_ES: Record<string, string> = {
@@ -106,6 +116,7 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const [isCapturing,      setIsCapturing]      = useState(false);
   const [isReleasing,      setIsReleasing]      = useState(false);
+  const [isEscaping,       setIsEscaping]       = useState(false);
   const [showReleaseModal, setShowReleaseModal] = useState(false);
   const [spriteIndex,      setSpriteIndex]      = useState(0);
   const cancelRef = useRef(false);
@@ -113,7 +124,7 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   const fabScale = useRef(new Animated.Value(1)).current;
   const fabSpin  = useRef(new Animated.Value(0)).current;
   const fabPrev  = useRef(isCaptured);
-  const isBusy   = isCapturing || isReleasing;
+  const isBusy   = isCapturing || isReleasing || isEscaping;
 
   useEffect(() => {
     if (!data) return;
@@ -185,8 +196,18 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
   // ── Handlers ──────────────────────────────────────────────────────────────
   const handleCaptureToggle = () => {
-    if (isCaptured) { setShowReleaseModal(true); }
-    else if (currentSprite && !isCapturing) { setIsCapturing(true); }
+    if (isCaptured) { setShowReleaseModal(true); return; }
+    if (isBusy || !currentSprite) return;
+
+    const captureRate = species?.capture_rate ?? 45;
+    const escaped = Math.random() < getEscapeChance(captureRate);
+    if (escaped) { setIsEscaping(true); }
+    else          { setIsCapturing(true); }
+  };
+
+  const handleEscapeComplete = () => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    setIsEscaping(false);
   };
 
   const handleCaptureComplete = () => {
@@ -235,8 +256,6 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
               </YStack>
             ) : null}
           </XStack>
-
-          <Text fontSize={32} fontWeight="800" color="$appText">{capitalize(data.name)}</Text>
 
           {genus ? (
             <Text fontSize={14} color="$textSecondary" style={{ fontStyle: 'italic' }}>{genus}</Text>
@@ -474,7 +493,7 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
       <Animated.View
         style={[
           styles.fab,
-          { bottom: insets.bottom + 24, transform: [{ scale: fabScale }] },
+          { bottom: 20, transform: [{ scale: fabScale }] },
         ]}
         pointerEvents="box-none"
       >
@@ -494,6 +513,7 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
       <CaptureEffect visible={isCapturing} onComplete={handleCaptureComplete} />
       <ReleaseEffect visible={isReleasing} onComplete={handleReleaseComplete} />
+      <EscapeEffect  visible={isEscaping}  onComplete={handleEscapeComplete} />
 
       <ReleaseModal
         visible={showReleaseModal}

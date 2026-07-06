@@ -1,7 +1,7 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { TamaguiProvider } from 'tamagui';
 import { tamaguiConfig } from './tamagui.config';
@@ -19,16 +19,14 @@ const queryClient = new QueryClient({
   },
 });
 
+// Renders only after Zustand has read AsyncStorage — guarantees useState sees real values.
 function AppContent() {
   const { profile, hasSeenSplash, setHasSeenSplash, trainerName } = useTrainerStore();
 
-  // Show generic splash on very first launch (no profile yet)
   const [genericSplashDone, setGenericSplashDone] = useState(
     hasSeenSplash || profile !== null
   );
-  // Show personalized splash when profile exists and hasn't been shown this session
   const [splashDone, setSplashDone] = useState(hasSeenSplash || !profile);
-  // Skip name input if name was already captured in a previous session or profile exists
   const [nameInputDone, setNameInputDone] = useState(!!(trainerName || profile));
 
   const handleGenericFinish = () => {
@@ -64,12 +62,27 @@ function AppContent() {
   );
 }
 
+// Waits for the Zustand persist middleware to finish reading AsyncStorage before
+// mounting AppContent, so useState initializers always see the real persisted values.
+// On a fresh install AsyncStorage is empty → profile/trainerName stay null → new-user flow.
+function AppShell() {
+  const [hydrated, setHydrated] = useState(useTrainerStore.persist.hasHydrated());
+
+  useEffect(() => {
+    if (hydrated) return;
+    return useTrainerStore.persist.onFinishHydration(() => setHydrated(true));
+  }, [hydrated]);
+
+  if (!hydrated) return null;
+  return <AppContent />;
+}
+
 export default function App() {
   return (
     <TamaguiProvider config={tamaguiConfig} defaultTheme="light">
       <SafeAreaProvider>
         <QueryClientProvider client={queryClient}>
-          <AppContent />
+          <AppShell />
         </QueryClientProvider>
       </SafeAreaProvider>
     </TamaguiProvider>
