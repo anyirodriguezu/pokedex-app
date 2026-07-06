@@ -15,10 +15,21 @@ Aplicación móvil construida con React Native (Expo SDK 54) que demuestra la tr
 | zustand | 5.0.2 |
 | tamagui | 2.4.0 |
 
-## Requisitos previos
+## Instalar la app (Android)
+
+Descarga directa del APK — no requiere login:
+
+```
+https://expo.dev/artifacts/eas/Bbv0pTrePrgHeaFm0PJPAz8DnV_vWA7ZWyNOZZXyWN4.apk
+```
+
+> Al instalar, Android pedirá activar **"Instalar de fuentes desconocidas"** — es normal.
+
+## Requisitos previos (desarrollo)
 
 - Node.js 18+
-- Expo Go instalado en el dispositivo móvil (o emulador Android/iOS)
+- EAS CLI: `npm install -g eas-cli`
+- Cuenta en [expo.dev](https://expo.dev)
 
 ## Instalación y ejecución
 
@@ -31,6 +42,23 @@ npx expo start
 ```
 
 Escanea el QR con Expo Go (Android) o la app Cámara (iOS).
+
+## Publicación con EAS Build
+
+```bash
+# Build de preview — genera APK compartible (Android)
+eas build --platform android --profile preview
+
+# Obtener el link directo al APK tras el build
+eas build:view <build-id>
+# → Campo "Application Archive URL" = link descargable sin login
+
+# Build de producción (App Bundle para Play Store)
+eas build --platform android --profile production
+
+# OTA updates sin rebuild
+eas update --auto
+```
 
 ## Scripts disponibles
 

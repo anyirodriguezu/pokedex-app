@@ -14,6 +14,8 @@ Todas las versiones están fijadas sin rangos en `package.json`. No usar `^` ni 
 | @tanstack/react-query | 5.62.3 |
 | react-hook-form | 7.53.2 |
 | zustand | 5.0.2 |
+| react-native-reanimated | ~4.1.1 |
+| react-native-worklets | (peer de reanimated 4.x) |
 
 ## Comandos esenciales
 
@@ -146,6 +148,31 @@ Primitivos correctos:
 
 - Seguir el estándar **Conventional Commits** (`feat:`, `fix:`, `chore:`, `docs:`, etc.)
 - No agregar al modelo de IA como co-autor (`Co-Authored-By`) en ningún commit
+
+## EAS Build — publicación
+
+El proyecto está configurado para publicar con EAS. Archivos clave: `eas.json` (perfiles de build) y `app.json` (IDs y configuración nativa).
+
+```bash
+# Build de preview — APK compartible directamente
+eas build --platform android --profile preview
+
+# Obtener link directo al APK (sin login)
+eas build:view <build-id>   # → campo "Application Archive URL"
+
+# OTA update sin rebuild
+eas update --auto
+```
+
+**Perfiles en `eas.json`:**
+- `development` — APK con cliente de desarrollo
+- `preview` — APK instalable para compartir (`distribution: internal`)
+- `production` — App Bundle para Google Play
+
+**Notas críticas:**
+- `react-native-reanimated@~4.1.1` es la versión validada por Expo SDK 54 para RN 0.81. No actualizar sin verificar compatibilidad con `npx expo-doctor`.
+- `react-native-worklets` es peer dependency obligatoria de reanimated 4.x — debe estar instalada explícitamente.
+- No agregar paquetes a `plugins` en `app.json` a menos que tengan `app.plugin.js` en su raíz. `expo-haptics` no lo tiene y rompe `expo config`.
 
 ## Expo SDK 54 — notas importantes
 
