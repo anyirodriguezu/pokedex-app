@@ -11,7 +11,7 @@ const SkeletonCard: React.FC = () => (
 );
 
 export const PokemonListSkeleton: React.FC = () => (
-  <View style={styles.grid}>
+  <View style={styles.grid} testID="pokemon-list-skeleton">
     {Array.from({ length: 10 }, (_, i) => (
       <SkeletonCard key={i} />
     ))}

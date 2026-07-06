@@ -60,7 +60,6 @@ export const EscapeEffect: React.FC<Props> = ({ visible, onComplete }) => {
       Animated.timing(ballRock, { toValue: v, duration: ms, useNativeDriver: true });
 
     Animated.sequence([
-      // Phase 1 — overlay + closed pokéball appears
       Animated.parallel([
         Animated.timing(bgOpacity,   { toValue: 0.6,  duration: 250, useNativeDriver: true }),
         Animated.sequence([
@@ -72,7 +71,6 @@ export const EscapeEffect: React.FC<Props> = ({ visible, onComplete }) => {
         ]),
       ]),
 
-      // Phase 2 — violent rocking (Pokémon fighting to escape)
       Animated.sequence([
         rock( 0.50, 100), rock(-0.50, 100),
         rock( 0.50, 100), rock(-0.50, 100),
@@ -80,7 +78,6 @@ export const EscapeEffect: React.FC<Props> = ({ visible, onComplete }) => {
         rock(    0,  80),
       ]),
 
-      // Phase 3 — red glow builds, then ball bursts open
       Animated.parallel([
         Animated.sequence([
           Animated.timing(glowOpacity, { toValue: 0.55, duration: 180, useNativeDriver: true }),
@@ -92,7 +89,6 @@ export const EscapeEffect: React.FC<Props> = ({ visible, onComplete }) => {
         ]),
       ]),
 
-      // Phase 4 — orange flash + label pops in
       Animated.parallel([
         Animated.sequence([
           Animated.timing(flashOpacity, { toValue: 0.65, duration: 70,  useNativeDriver: true }),
@@ -107,7 +103,6 @@ export const EscapeEffect: React.FC<Props> = ({ visible, onComplete }) => {
         ]),
       ]),
 
-      // Phase 5 — hold briefly, then fade out everything
       Animated.delay(700),
       Animated.parallel([
         Animated.timing(bgOpacity,    { toValue: 0, duration: 320, useNativeDriver: true }),
@@ -128,13 +123,10 @@ export const EscapeEffect: React.FC<Props> = ({ visible, onComplete }) => {
 
   return (
     <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
-      {/* Dark overlay */}
       <Animated.View style={[StyleSheet.absoluteFillObject, { backgroundColor: '#000', opacity: bgOpacity }]} />
 
-      {/* Red danger glow */}
       <Animated.View style={[StyleSheet.absoluteFillObject, { backgroundColor: '#EF4444', opacity: glowOpacity }]} />
 
-      {/* Pokéball — rocks violently then opens */}
       <Animated.View
         style={{
           position: 'absolute',
@@ -166,7 +158,6 @@ export const EscapeEffect: React.FC<Props> = ({ visible, onComplete }) => {
         </Animated.View>
       </Animated.View>
 
-      {/* "¡Se escapó!" label */}
       <Animated.View
         style={{
           position: 'absolute', left: 0, right: 0,
@@ -179,7 +170,6 @@ export const EscapeEffect: React.FC<Props> = ({ visible, onComplete }) => {
         <Text style={styles.escapeLabel}>¡Se escapó!</Text>
       </Animated.View>
 
-      {/* Orange burst flash */}
       <Animated.View
         style={[StyleSheet.absoluteFillObject, { backgroundColor: '#F97316', opacity: flashOpacity }]}
       />

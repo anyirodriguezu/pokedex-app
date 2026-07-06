@@ -125,7 +125,6 @@ export const PokemonListScreen: React.FC<Props> = ({ navigation }) => {
     setFiltersExpanded((v) => !v);
   };
 
-  // Active filter summary for the collapsed state
   const activeFiltersLabel = [
     selectedType ? POKEDEX_TYPES.find((t) => t.slug === selectedType)?.label : null,
     selectedGen !== null ? GENERATION_RANGES[selectedGen]?.label : null,
@@ -154,7 +153,6 @@ export const PokemonListScreen: React.FC<Props> = ({ navigation }) => {
 
   const filterChips = (
     <View style={styles.filtersSection}>
-      {/* Toggle row */}
       <View style={styles.filterToggleRow}>
         <Pressable
           style={[styles.filterToggleBtn, isFiltering && styles.filterToggleBtnActive]}
@@ -196,7 +194,6 @@ export const PokemonListScreen: React.FC<Props> = ({ navigation }) => {
         )}
       </View>
 
-      {/* Expandable filter panel */}
       {filtersExpanded && (
         <View style={styles.filterPanel}>
           <Text style={styles.filterLabel}>Tipo</Text>
@@ -266,12 +263,10 @@ export const PokemonListScreen: React.FC<Props> = ({ navigation }) => {
     );
   }
 
-  // Combined loading: filter API or search debounce/API
   const showLoading = isLoadingFilter || isDebouncing || (isSearching && isLoadingApi);
 
   return (
     <View style={styles.root}>
-      {/* Barra de búsqueda — siempre visible */}
       <View style={styles.searchRow}>
         <TextInput
           style={styles.searchInput}
@@ -296,25 +291,19 @@ export const PokemonListScreen: React.FC<Props> = ({ navigation }) => {
         )}
       </View>
 
-      {/* Filtros — siempre visibles */}
       {filterChips}
 
-      {/* Zona de resultados */}
       <View style={styles.flex1}>
-
-        {/* Loading centralizado en zona de resultados */}
         {showLoading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={Colors.primary} />
           </View>
         ) : showApi && apiPokemon ? (
-          /* Resultado exacto de API (solo sin filtros de tipo/gen activos) */
           <View style={styles.singleResult}>
             <PokemonCard pokemon={apiPokemon} onPress={handlePress} />
             <View style={styles.singleResultSpacer} />
           </View>
         ) : hasNoResults && !isFiltering ? (
-          /* Sin resultados y sin filtro de tipo/gen */
           <View style={styles.emptyState}>
             <Text style={styles.emptyText}>
               No encontramos ningún Pokémon con ese nombre o número 😕
@@ -324,7 +313,6 @@ export const PokemonListScreen: React.FC<Props> = ({ navigation }) => {
             </Text>
           </View>
         ) : (
-          /* Lista unificada */
           <FlatList
             ref={flatListRef}
             data={localResults}
@@ -351,7 +339,6 @@ export const PokemonListScreen: React.FC<Props> = ({ navigation }) => {
           />
         )}
 
-        {/* FAB back-to-top */}
         <Animated.View
           style={[styles.fab, { opacity: showFabAnim, transform: [{ scale: showFabAnim }] }]}
           pointerEvents="box-none"

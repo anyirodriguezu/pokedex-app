@@ -119,14 +119,12 @@ export const ReleaseEffect: React.FC<Props> = ({ visible, onComplete }) => {
       ]);
 
     Animated.sequence([
-      // Fase 1 — overlay oscuro + pokébola aparece
       Animated.parallel([
         Animated.timing(bgOpacity,   { toValue: 0.55, duration: T_OPEN * 0.6, useNativeDriver: true }),
         Animated.timing(ballScale,   { toValue: 1,    duration: T_OPEN * 0.6, useNativeDriver: true }),
         Animated.timing(ballOpacity, { toValue: 1,    duration: T_OPEN * 0.6, useNativeDriver: true }),
       ]),
 
-      // Fase 2 — pokébola se abre + rayo de luz + anillo 1
       Animated.parallel([
         Animated.timing(topHalfY,    { toValue: -HALF * 1.2, duration: T_OPEN, useNativeDriver: true }),
         Animated.timing(bottomHalfY, { toValue:  HALF * 1.2, duration: T_OPEN, useNativeDriver: true }),
@@ -137,7 +135,6 @@ export const ReleaseEffect: React.FC<Props> = ({ visible, onComplete }) => {
         makeRing(ring1Scale, ring1Opacity, 0),
       ]),
 
-      // Fase 3 — doble destello + anillo 2 + label
       Animated.parallel([
         Animated.sequence([
           Animated.timing(flashOpacity, { toValue: 0.85, duration: T_FLASH / 2, useNativeDriver: true }),
@@ -155,7 +152,6 @@ export const ReleaseEffect: React.FC<Props> = ({ visible, onComplete }) => {
         ]),
       ]),
 
-      // Fase 4 — partículas 360° + todo desaparece
       Animated.parallel([
         Animated.timing(bgOpacity,    { toValue: 0, duration: T_BURST,        useNativeDriver: true }),
         Animated.timing(ballOpacity,  { toValue: 0, duration: T_BURST * 0.4,  useNativeDriver: true }),
@@ -182,10 +178,8 @@ export const ReleaseEffect: React.FC<Props> = ({ visible, onComplete }) => {
 
   return (
     <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
-      {/* Overlay oscuro */}
       <Animated.View style={[StyleSheet.absoluteFillObject, { backgroundColor: '#000', opacity: bgOpacity }]} />
 
-      {/* Rayo de luz */}
       <Animated.View
         style={{
           position:  'absolute',
@@ -202,7 +196,6 @@ export const ReleaseEffect: React.FC<Props> = ({ visible, onComplete }) => {
         <View style={styles.beam} />
       </Animated.View>
 
-      {/* Mitad superior de la pokébola */}
       <Animated.View
         style={{
           position: 'absolute',
@@ -218,7 +211,6 @@ export const ReleaseEffect: React.FC<Props> = ({ visible, onComplete }) => {
         <DrawnPokeBallTop />
       </Animated.View>
 
-      {/* Mitad inferior de la pokébola */}
       <Animated.View
         style={{
           position: 'absolute',
@@ -234,7 +226,6 @@ export const ReleaseEffect: React.FC<Props> = ({ visible, onComplete }) => {
         <DrawnPokeBallBottom />
       </Animated.View>
 
-      {/* Partículas 360° */}
       {particles.map((p, i) => {
         const rotate = p.rotate.interpolate({ inputRange: [0, 4], outputRange: ['0deg', '1440deg'] });
         return (
@@ -255,7 +246,6 @@ export const ReleaseEffect: React.FC<Props> = ({ visible, onComplete }) => {
         );
       })}
 
-      {/* Anillos de onda expansiva */}
       {([
         { scale: ring1Scale, opacity: ring1Opacity, color: '#60A5FA' },
         { scale: ring2Scale, opacity: ring2Opacity, color: '#E0F9FF' },
@@ -277,7 +267,6 @@ export const ReleaseEffect: React.FC<Props> = ({ visible, onComplete }) => {
         />
       ))}
 
-      {/* Label "¡Liberado!" */}
       <Animated.View
         style={{
           position: 'absolute',
@@ -292,7 +281,6 @@ export const ReleaseEffect: React.FC<Props> = ({ visible, onComplete }) => {
         <Text style={styles.releaseLabel}>¡Liberado!</Text>
       </Animated.View>
 
-      {/* Flash azul-blanco */}
       <Animated.View
         style={[StyleSheet.absoluteFillObject, { backgroundColor: '#BAE6FD', opacity: flashOpacity }]}
       />

@@ -166,7 +166,6 @@ export const TeamScreen: React.FC = () => {
         keyExtractor={(item) => String(item.id)}
         ListHeaderComponent={
           <YStack gap="$4">
-            {/* Equipo activo */}
             <YStack gap="$3">
               <XStack justify="space-between" items="center">
                 <Text style={styles.sectionTitle}>Equipo Activo</Text>
@@ -198,7 +197,6 @@ export const TeamScreen: React.FC = () => {
               </View>
             </YStack>
 
-            {/* Laboratorio header */}
             {box.length > 0 && (
               <YStack gap="$2">
                 <XStack justify="space-between" items="center">

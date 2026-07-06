@@ -84,7 +84,6 @@ export const CapturedAura: React.FC<Props> = ({ visible, isInTeam }) => {
       timers.current.push(t);
     };
 
-    // Tinte de fondo que "respira"
     const runTint = () => {
       Animated.sequence([
         Animated.timing(tintPulse, { toValue: 0.10, duration: 2200, useNativeDriver: true }),
@@ -94,7 +93,6 @@ export const CapturedAura: React.FC<Props> = ({ visible, isInTeam }) => {
       });
     };
 
-    // Flotación vertical + fade
     const runFloat = (p: FloatParticle) => {
       p.ty.setValue(0);
       p.opacity.setValue(0);
@@ -114,7 +112,6 @@ export const CapturedAura: React.FC<Props> = ({ visible, isInTeam }) => {
       });
     };
 
-    // Balanceo horizontal
     const runWobble = (p: FloatParticle) => {
       Animated.sequence([
         Animated.timing(p.tx, { toValue:  p.wobbleAmp, duration: p.wobbleDur, useNativeDriver: true }),
@@ -124,7 +121,6 @@ export const CapturedAura: React.FC<Props> = ({ visible, isInTeam }) => {
       });
     };
 
-    // Pulso de escala
     const runPulse = (p: FloatParticle) => {
       Animated.sequence([
         Animated.timing(p.scale, { toValue: 1.6, duration: p.pulseDur, useNativeDriver: true }),
@@ -134,7 +130,6 @@ export const CapturedAura: React.FC<Props> = ({ visible, isInTeam }) => {
       });
     };
 
-    // Rotación (solo partículas alargadas)
     const runRotate = (p: FloatParticle) => {
       p.rotate.setValue(0);
       Animated.timing(p.rotate, {
@@ -146,7 +141,6 @@ export const CapturedAura: React.FC<Props> = ({ visible, isInTeam }) => {
       });
     };
 
-    // Anillos de ping periódicos
     const runRing = (ring: Ring) => {
       ring.scale.setValue(0.2);
       ring.opacity.setValue(0);
@@ -202,12 +196,10 @@ export const CapturedAura: React.FC<Props> = ({ visible, isInTeam }) => {
 
   return (
     <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
-      {/* Tinte de fondo que respira */}
       <Animated.View
         style={[StyleSheet.absoluteFillObject, { backgroundColor: tintColor, opacity: tintPulse }]}
       />
 
-      {/* Anillos de ping desde el centro */}
       {rings.map((ring, i) => (
         <Animated.View
           key={`ring-${i}`}
@@ -226,7 +218,6 @@ export const CapturedAura: React.FC<Props> = ({ visible, isInTeam }) => {
         />
       ))}
 
-      {/* Partículas flotantes */}
       {particles.map((p, i) => {
         const rotateInterp = p.rotate.interpolate({
           inputRange:  [0, 1],

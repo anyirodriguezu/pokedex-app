@@ -127,7 +127,6 @@ export const CaptureEffect: React.FC<Props> = ({ visible, onComplete, label = 'Â
       ]);
 
     Animated.sequence([
-      // Fase 1 â€” overlay oscuro + pokÃ©bola abierta aparece
       Animated.parallel([
         Animated.timing(bgOpacity,   { toValue: 0.55, duration: T_SHOW, useNativeDriver: true }),
         Animated.sequence([
@@ -140,14 +139,12 @@ export const CaptureEffect: React.FC<Props> = ({ visible, onComplete, label = 'Â
         ]),
       ]),
 
-      // Fase 2 â€” pokÃ©bola se cierra (el PokÃ©mon es atrapado)
       Animated.parallel([
         Animated.timing(topHalfY,    { toValue: 0, duration: T_CLOSE, useNativeDriver: true }),
         Animated.timing(bottomHalfY, { toValue: 0, duration: T_CLOSE, useNativeDriver: true }),
         Animated.timing(beamOpacity, { toValue: 0, duration: T_CLOSE * 0.55, useNativeDriver: true }),
       ]),
 
-      // Fase 3 â€” balanceo (el PokÃ©mon lucha dentro)
       Animated.sequence([
         rock( 0.30, 110), rock(-0.30, 110),
         rock( 0.22, 100), rock(-0.22, 100),
@@ -155,7 +152,6 @@ export const CaptureEffect: React.FC<Props> = ({ visible, onComplete, label = 'Â
         rock(    0,  70),
       ]),
 
-      // Fase 4 â€” doble destello + 3 anillos + label
       Animated.parallel([
         Animated.sequence([
           Animated.timing(flashOpacity, { toValue: 0.9,  duration: T_FLASH / 2, useNativeDriver: true }),
@@ -175,7 +171,6 @@ export const CaptureEffect: React.FC<Props> = ({ visible, onComplete, label = 'Â
         ]),
       ]),
 
-      // Fase 5 â€” confeti + pokÃ©bola y overlay desaparecen
       Animated.parallel([
         Animated.timing(bgOpacity,    { toValue: 0,   duration: T_BURST,        useNativeDriver: true }),
         Animated.timing(ballOpacity,  { toValue: 0,   duration: T_BURST * 0.45, useNativeDriver: true }),
@@ -207,10 +202,8 @@ export const CaptureEffect: React.FC<Props> = ({ visible, onComplete, label = 'Â
 
   return (
     <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
-      {/* Overlay oscuro */}
       <Animated.View style={[StyleSheet.absoluteFillObject, { backgroundColor: '#000', opacity: bgOpacity }]} />
 
-      {/* PartÃ­culas de confeti */}
       {particles.map((p, i) => {
         const rotate = p.rotate.interpolate({ inputRange: [0, 5], outputRange: ['0deg', '1800deg'] });
         return (
@@ -231,7 +224,6 @@ export const CaptureEffect: React.FC<Props> = ({ visible, onComplete, label = 'Â
         );
       })}
 
-      {/* Anillos de onda expansiva */}
       {([
         { scale: ring1Scale, opacity: ring1Opacity, color: '#E3350D' },
         { scale: ring2Scale, opacity: ring2Opacity, color: '#F8D030' },
@@ -254,7 +246,6 @@ export const CaptureEffect: React.FC<Props> = ({ visible, onComplete, label = 'Â
         />
       ))}
 
-      {/* Rayo de luz (visible mientras la pokÃ©bola estÃ¡ abierta) */}
       <Animated.View
         style={{
           position:  'absolute',
@@ -270,7 +261,6 @@ export const CaptureEffect: React.FC<Props> = ({ visible, onComplete, label = 'Â
         <View style={styles.beam} />
       </Animated.View>
 
-      {/* PokÃ©bola â€” wrapper para escala + balanceo, mitades con translateY para abrir/cerrar */}
       <Animated.View
         style={{
           position: 'absolute',
@@ -282,7 +272,6 @@ export const CaptureEffect: React.FC<Props> = ({ visible, onComplete, label = 'Â
           transform: [{ scale: ballScale }, { rotate: rockRotate }],
         }}
       >
-        {/* Mitad superior */}
         <Animated.View
           style={{
             position: 'absolute',
@@ -297,7 +286,6 @@ export const CaptureEffect: React.FC<Props> = ({ visible, onComplete, label = 'Â
           <DrawnPokeBallTop />
         </Animated.View>
 
-        {/* Mitad inferior */}
         <Animated.View
           style={{
             position: 'absolute',
@@ -313,7 +301,6 @@ export const CaptureEffect: React.FC<Props> = ({ visible, onComplete, label = 'Â
         </Animated.View>
       </Animated.View>
 
-      {/* Label "Â¡Atrapado!" */}
       <Animated.View
         style={{
           position: 'absolute',
@@ -328,7 +315,6 @@ export const CaptureEffect: React.FC<Props> = ({ visible, onComplete, label = 'Â
         <Text style={styles.captureLabel}>{label}</Text>
       </Animated.View>
 
-      {/* Destello blanco */}
       <Animated.View
         style={[StyleSheet.absoluteFillObject, { backgroundColor: '#fff', opacity: flashOpacity }]}
       />

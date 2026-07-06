@@ -235,7 +235,6 @@ export const Step2PreferencesScreen: React.FC<Props> = ({ navigation, route }) =
         </YStack>
       </ScrollView>
 
-      {/* Modal de elección cuando el tipo de pokémon cambia */}
       <Modal
         visible={showPokemonChoice}
         transparent

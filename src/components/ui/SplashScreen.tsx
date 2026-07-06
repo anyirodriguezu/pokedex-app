@@ -6,7 +6,6 @@ import { TrainerProfile } from '../../features/trainer/types/trainer.types';
 import { getTrainerTypeColor } from '../../utils/pokemonHelpers';
 
 
-// Pokébola animada para el splash genérico
 const AnimatedPokeball: React.FC<{ spinAnim: Animated.Value; scaleAnim: Animated.Value }> = ({
   spinAnim,
   scaleAnim,
@@ -28,7 +27,6 @@ const AnimatedPokeball: React.FC<{ spinAnim: Animated.Value; scaleAnim: Animated
   );
 };
 
-// --- Splash genérico (primer uso, sin perfil) ---
 interface GenericSplashProps {
   onFinish: () => void;
 }
@@ -42,7 +40,6 @@ export const GenericSplash: React.FC<GenericSplashProps> = ({ onFinish }) => {
 
   useEffect(() => {
     Animated.sequence([
-      // Pokébola entra con bounce
       Animated.parallel([
         Animated.spring(scaleAnim, {
           toValue: 1,
@@ -59,13 +56,11 @@ export const GenericSplash: React.FC<GenericSplashProps> = ({ onFinish }) => {
           { iterations: 2 }
         ),
       ]),
-      // Título aparece
       Animated.parallel([
         Animated.timing(titleOpacity, { toValue: 1, duration: 400, useNativeDriver: true }),
         Animated.timing(titleY, { toValue: 0, duration: 400, useNativeDriver: true }),
       ]),
       Animated.delay(200),
-      // Subtítulo aparece
       Animated.timing(subtitleOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
     ]).start();
 
@@ -88,7 +83,6 @@ export const GenericSplash: React.FC<GenericSplashProps> = ({ onFinish }) => {
   );
 };
 
-// --- Splash de bienvenida (usuario con perfil) ---
 interface Props {
   profile: TrainerProfile;
   onFinish: () => void;
@@ -97,7 +91,6 @@ interface Props {
 export const SplashScreen: React.FC<Props> = ({ profile, onFinish }) => {
   const typeColor = getTrainerTypeColor(profile.favoritePokemonType);
 
-  // Animations
   const bgScale = useRef(new Animated.Value(0)).current;
   const bgOpacity = useRef(new Animated.Value(0)).current;
   const spriteY = useRef(new Animated.Value(80)).current;
@@ -111,7 +104,6 @@ export const SplashScreen: React.FC<Props> = ({ profile, onFinish }) => {
 
   useEffect(() => {
     Animated.sequence([
-      // Fondo de tipo explota desde el centro
       Animated.parallel([
         Animated.spring(bgScale, {
           toValue: 1,
@@ -122,7 +114,6 @@ export const SplashScreen: React.FC<Props> = ({ profile, onFinish }) => {
         Animated.timing(bgOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
       ]),
 
-      // Pokémon sube con bounce
       Animated.parallel([
         Animated.spring(spriteY, {
           toValue: 0,
@@ -142,7 +133,6 @@ export const SplashScreen: React.FC<Props> = ({ profile, onFinish }) => {
 
       Animated.delay(100),
 
-      // Nombre con slide desde la izquierda
       Animated.parallel([
         Animated.timing(titleOpacity, { toValue: 1, duration: 350, useNativeDriver: true }),
         Animated.timing(titleX, { toValue: 0, duration: 350, useNativeDriver: true }),
@@ -150,7 +140,6 @@ export const SplashScreen: React.FC<Props> = ({ profile, onFinish }) => {
 
       Animated.delay(80),
 
-      // Subtítulo
       Animated.parallel([
         Animated.timing(subtitleOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
         Animated.timing(subtitleX, { toValue: 0, duration: 300, useNativeDriver: true }),
@@ -163,7 +152,6 @@ export const SplashScreen: React.FC<Props> = ({ profile, onFinish }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: typeColor }]}>
-      {/* Círculo de tipo expandiéndose desde el fondo */}
       <Animated.View
         style={[
           styles.typeBg,
@@ -175,12 +163,10 @@ export const SplashScreen: React.FC<Props> = ({ profile, onFinish }) => {
         ]}
       />
 
-      {/* Glow circular debajo del sprite */}
       {profile.starterPokemon?.sprite ? (
         <Animated.View style={[styles.glowCircle, { opacity: glowOpacity }]} />
       ) : null}
 
-      {/* Sprite del pokémon */}
       {profile.starterPokemon?.sprite ? (
         <Animated.View
           style={{
@@ -199,7 +185,6 @@ export const SplashScreen: React.FC<Props> = ({ profile, onFinish }) => {
         <View style={styles.spritePlaceholder} />
       )}
 
-      {/* Nombre del entrenador */}
       <Animated.View
         style={{
           opacity: titleOpacity,
@@ -211,7 +196,6 @@ export const SplashScreen: React.FC<Props> = ({ profile, onFinish }) => {
         <Text style={styles.nameText}>{profile.fullName}!</Text>
       </Animated.View>
 
-      {/* Subtítulo */}
       <Animated.View
         style={{
           opacity: subtitleOpacity,
@@ -236,7 +220,6 @@ const styles = StyleSheet.create({
     padding: 32,
     overflow: 'hidden',
   },
-  // Generic splash
   pokeball: {
     width: POKEBALL_SIZE,
     height: POKEBALL_SIZE,
@@ -308,7 +291,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 8,
   },
-  // Profile splash
   typeBg: {
     position: 'absolute',
     width: 600,

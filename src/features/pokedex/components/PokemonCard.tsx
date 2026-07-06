@@ -53,7 +53,6 @@ export const PokemonCard = React.memo(function PokemonCard({
         pb="$1"
         style={styles.imageArea}
       >
-        {/* Grayscale wrapper para no capturados */}
         <View style={!isCaptured ? (styles.grayscaleWrapper as object) : undefined}>
           <Image
             source={{ uri: imageUrl }}

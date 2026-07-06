@@ -95,7 +95,6 @@ export const PokemonEvolutionChain: React.FC<Props> = ({ chain, currentId, onPre
         <View style={styles.chainRow}>
           {stages.map((stage, stageIndex) => (
             <React.Fragment key={stageIndex}>
-              {/* Arrow + triggers column between stages */}
               {stageIndex > 0 && (
                 <View style={styles.arrowCol}>
                   {stage.map((node, nodeIndex) => (
@@ -109,7 +108,6 @@ export const PokemonEvolutionChain: React.FC<Props> = ({ chain, currentId, onPre
                 </View>
               )}
 
-              {/* Stage pokemon column */}
               <View style={styles.stageCol}>
                 {stage.map((node) => {
                   const isCurrent = node.id === currentId;

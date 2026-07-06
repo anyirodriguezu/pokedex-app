@@ -41,7 +41,6 @@ export const TransferMachineModal: React.FC<Props> = ({
   const onCloseRef = useRef(onClose);
   useEffect(() => { onCloseRef.current = onClose; }, [onClose]);
 
-  // Animación de entrada cuando el modal se vuelve visible
   useEffect(() => {
     if (visible) {
       translateY.setValue(600);
@@ -152,33 +151,20 @@ export const TransferMachineModal: React.FC<Props> = ({
         <Animated.View
           style={[styles.sheet, { transform: [{ translateY }], paddingBottom: insets.bottom + 16 }]}
         >
-          {/*
-           * Capa 1 (fondo): detector de gestos.
-           * Cubre toda la hoja y recibe cualquier toque que no sea capturado
-           * por los Pressable / FlatList de la capa superior.
-           */}
           <View style={StyleSheet.absoluteFillObject} {...panResponder.panHandlers} />
 
-          {/*
-           * Capa 2 (frente): todo el contenido visual e interactivo.
-           * pointerEvents="box-none" → este View no recibe toques por sí mismo,
-           * pero sus hijos sí. Los toques en áreas vacías caen a la capa 1.
-           */}
           <View style={styles.contentLayer} pointerEvents="box-none">
 
-            {/* Handle + título */}
             <View style={styles.dragZone}>
               <View style={styles.handle} />
               <Text style={styles.title}>⚡ Máquina de Transferencias</Text>
               <Text style={styles.subtitle}>Laboratorio ↔ Equipo Activo</Text>
             </View>
 
-            {/* Instrucción dinámica */}
             <View style={[styles.instructionBox, transferred && styles.instructionSuccess]}>
               <Text style={styles.instructionText}>{instructionText()}</Text>
             </View>
 
-            {/* Laboratorio */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>🧪 Laboratorio Pokémon ({labPokemon.length})</Text>
               {labPokemon.length === 0 ? (
@@ -218,7 +204,6 @@ export const TransferMachineModal: React.FC<Props> = ({
               )}
             </View>
 
-            {/* Divisor máquina */}
             <View style={styles.machineDivider}>
               <View style={styles.machineLine} />
               <View style={styles.machineIcon}>
@@ -229,7 +214,6 @@ export const TransferMachineModal: React.FC<Props> = ({
               <View style={styles.machineLine} />
             </View>
 
-            {/* Equipo activo */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>
                 Equipo Activo ({activeTeam.length}/{MAX_ACTIVE_TEAM})
@@ -272,7 +256,6 @@ export const TransferMachineModal: React.FC<Props> = ({
               </View>
             </View>
 
-            {/* Cerrar */}
             <Pressable style={styles.closeBtn} onPress={closeSheet} accessibilityRole="button">
               <Text style={styles.closeBtnText}>Cerrar</Text>
             </Pressable>
@@ -296,7 +279,6 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 28,
     maxHeight: '92%',
   },
-  // La capa de contenido ocupa el mismo espacio que la hoja
   contentLayer: {
     gap: 0,
   },

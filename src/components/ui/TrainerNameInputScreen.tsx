@@ -57,7 +57,6 @@ export const TrainerNameInputScreen: React.FC<Props> = ({ onFinish }) => {
       <Animated.View
         style={[styles.content, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}
       >
-        {/* Pokéball decorativa */}
         <View style={styles.pokeball}>
           <View style={styles.pokeballTop} />
           <View style={styles.pokeballBottom} />

@@ -33,9 +33,22 @@ type PressableComponentProps = {
   [key: string]: unknown;
 };
 
-export const YStack = ({ children, style }: LayoutProps) => (
-  <View style={style as StyleProp<ViewStyle>}>{children}</View>
-);
+export const YStack = ({ children, style, onPress, accessibilityRole, accessibilityLabel, accessibilityState }: LayoutProps) => {
+  if (typeof onPress === 'function') {
+    return (
+      <Pressable
+        onPress={onPress as (event: GestureResponderEvent) => void}
+        accessibilityRole={accessibilityRole as React.ComponentProps<typeof Pressable>['accessibilityRole']}
+        accessibilityLabel={typeof accessibilityLabel === 'string' ? accessibilityLabel : undefined}
+        accessibilityState={accessibilityState as React.ComponentProps<typeof Pressable>['accessibilityState']}
+        style={style as StyleProp<ViewStyle>}
+      >
+        {children}
+      </Pressable>
+    );
+  }
+  return <View style={style as StyleProp<ViewStyle>}>{children}</View>;
+};
 export const XStack = ({ children, style }: LayoutProps) => (
   <View style={style as StyleProp<ViewStyle>}>{children}</View>
 );

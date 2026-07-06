@@ -12,7 +12,11 @@ import { RootTabParamList } from './types';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
-const TAB_ORDER: Array<keyof RootTabParamList> = ['Pokedex', 'Team', 'Trainer'];
+const TAB_ORDER: (keyof RootTabParamList)[] = ['Pokedex', 'Team', 'Trainer'];
+
+interface SwipeNavigation {
+  navigate(name: keyof RootTabParamList): void;
+}
 
 const EDGE_ZONE = 32;
 
@@ -20,7 +24,7 @@ function makeSwipeWrapper<P extends object>(
   WrappedComponent: React.ComponentType<P>,
   tabIndex: number,
 ): React.ComponentType<P> {
-  const SwipeWrapper: React.FC<P & { navigation: any }> = (props) => {
+  const SwipeWrapper: React.FC<P & { navigation: SwipeNavigation }> = (props) => {
     const navRef = useRef(props.navigation);
     useEffect(() => { navRef.current = props.navigation; }, [props.navigation]);
 
@@ -69,8 +73,6 @@ const PokedexSwipeable = makeSwipeWrapper(PokedexStack, 0);
 const TeamSwipeable    = makeSwipeWrapper(TeamStack,    1);
 const TrainerSwipeable = makeSwipeWrapper(TrainerStack, 2);
 
-// ── Tab icon ───────────────────────────────────────────────────────────────
-
 interface TabIconProps {
   emoji: string;
   focused: boolean;
@@ -86,8 +88,6 @@ const TabIcon: React.FC<TabIconProps> = ({ emoji, focused, accessibilityLabel })
     {emoji}
   </Text>
 );
-
-// ── Navigator ─────────────────────────────────────────────────────────────
 
 export const RootNavigator: React.FC = () => {
   const insets = useSafeAreaInsets();

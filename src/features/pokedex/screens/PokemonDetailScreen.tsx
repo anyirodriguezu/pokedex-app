@@ -27,8 +27,6 @@ type Props = NativeStackScreenProps<PokedexStackParamList, 'PokemonDetail'>;
 
 interface SpriteOption { uri: string; label: string }
 
-// ── Helpers ────────────────────────────────────────────────────────────────
-
 function getFlavorText(
   entries: { flavor_text: string; language: { name: string } }[]
 ): string {
@@ -83,8 +81,6 @@ const GROWTH_RATE_ES: Record<string, string> = {
   'fast-then-very-slow': 'Errático',
 };
 
-// ── Subcomponentes ────────────────────────────────────────────────────────
-
 const Divider: React.FC = () => <View style={styles.divider} />;
 
 const SectionTitle: React.FC<{ label: string; color?: string }> = ({ label, color = '#6366F1' }) => (
@@ -100,8 +96,6 @@ const GenderBar: React.FC<{ male: number; female: number }> = ({ male, female })
     <View style={[styles.genderFemale, { flex: female }]} />
   </View>
 );
-
-// ── Pantalla ───────────────────────────────────────────────────────────────
 
 export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   const { pokemonId } = route.params;
@@ -161,7 +155,6 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
     return <ErrorState message="No se pudo cargar el detalle del Pokémon" onRetry={() => refetch()} />;
   }
 
-  // ── Sprites ───────────────────────────────────────────────────────────────
   const artwork = data.sprites.other['official-artwork'].front_default;
   const artworkShiny = data.sprites.other['official-artwork'].front_shiny;
 
@@ -185,7 +178,6 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   const currentSprite = sprites[spriteIndex] ?? sprites[0];
   const typeColor = getTypeColor(data.types[0]?.type.name ?? 'normal');
 
-  // ── Species ───────────────────────────────────────────────────────────────
   const flavorText  = species ? getFlavorText(species.flavor_text_entries) : '';
   const genus       = species ? getGenus(species.genera) : '';
   const generation  = species ? formatGeneration(species.generation.name) : '';
@@ -194,7 +186,6 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   const eggGroups   = (species?.egg_groups ?? []).map((g) => EGG_GROUP_ES[g.name] ?? capitalize(g.name));
   const growthRate  = species ? (GROWTH_RATE_ES[species.growth_rate.name] ?? capitalize(species.growth_rate.name)) : '';
 
-  // ── Handlers ──────────────────────────────────────────────────────────────
   const handleCaptureToggle = () => {
     if (isCaptured) { setShowReleaseModal(true); return; }
     if (isBusy || !currentSprite) return;
@@ -244,7 +235,6 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 96 }]}
       >
 
-        {/* ── Cabecera: número, nombre, categoría, tipos, badges ──────── */}
         <YStack items="center" gap="$2">
           <XStack gap="$2" items="center">
             <Text fontSize={16} color="$textSecondary" fontWeight="500">
@@ -297,7 +287,6 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
           </XStack>
         </YStack>
 
-        {/* ── Descripción Pokédex ─────────────────────────────────────── */}
         {flavorText ? (
           <Card bg="$surface" rounded={16} p="$4" elevation={2}>
             <Text fontSize={14} color="$appText" lineHeight={22} style={{ fontStyle: 'italic' }}>
@@ -306,7 +295,6 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
           </Card>
         ) : null}
 
-        {/* ── Galería de sprites ──────────────────────────────────────── */}
         {currentSprite && (
           <Card bg="$surface" rounded={20} p="$4" elevation={2} items="center" gap="$3">
             <Image source={{ uri: currentSprite.uri }} style={styles.image}
@@ -335,7 +323,6 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
           </Card>
         )}
 
-        {/* ── Cadena de evolución ─────────────────────────────────────── */}
         {evoChain && (
           <PokemonEvolutionChain
             chain={evoChain.chain}
@@ -346,7 +333,6 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
           />
         )}
 
-        {/* ── Datos físicos + género + captura + felicidad ─────────────── */}
         <Card bg="$surface" rounded={16} p="$4" elevation={2} gap="$3">
           <SectionTitle label="Datos físicos" color={typeColor} />
 
@@ -431,7 +417,6 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
           )}
         </Card>
 
-        {/* ── Habilidades ─────────────────────────────────────────────── */}
         {data.abilities.length > 0 && (
           <Card bg="$surface" rounded={16} p="$4" elevation={2} gap="$3">
             <SectionTitle label="Habilidades" color={typeColor} />
@@ -453,7 +438,6 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
           </Card>
         )}
 
-        {/* ── Crianza ─────────────────────────────────────────────────── */}
         {species && (eggGroups.length > 0 || growthRate) && (
           <Card bg="$surface" rounded={16} p="$4" elevation={2} gap="$3">
             <SectionTitle label="Crianza" color={typeColor} />
@@ -484,12 +468,10 @@ export const PokemonDetailScreen: React.FC<Props> = ({ route, navigation }) => {
           </Card>
         )}
 
-        {/* ── Estadísticas ─────────────────────────────────────────────── */}
         <PokemonStats stats={data.stats} />
 
       </ScrollView>
 
-      {/* ── FAB Capturar / Liberar ─────────────────────────────────── */}
       <Animated.View
         style={[
           styles.fab,
