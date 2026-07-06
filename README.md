@@ -1,5 +1,15 @@
 # Pokédex App
 
+![Expo](https://img.shields.io/badge/Expo-54.0.34-000020?style=flat&logo=expo&logoColor=white)
+![React Native](https://img.shields.io/badge/React_Native-0.81.0-61DAFB?style=flat&logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.5.4-3178C6?style=flat&logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/React-19.1.0-61DAFB?style=flat&logo=react&logoColor=black)
+![Zustand](https://img.shields.io/badge/Zustand-5.0.2-433E38?style=flat)
+![TanStack Query](https://img.shields.io/badge/TanStack_Query-5.62.3-FF4154?style=flat&logo=reactquery&logoColor=white)
+![React Hook Form](https://img.shields.io/badge/React_Hook_Form-7.53.2-EC5990?style=flat&logo=reacthookform&logoColor=white)
+![Tamagui](https://img.shields.io/badge/Tamagui-2.4.0-000?style=flat)
+![React Navigation](https://img.shields.io/badge/React_Navigation-7.x-6B52AE?style=flat)
+
 Aplicación móvil construida con React Native y Expo SDK 54 que combina una Pokédex interactiva con un sistema completo de registro de entrenador. Permite explorar la Pokédex, capturar Pokémon, gestionar tu equipo activo y caja, y construir tu perfil de entrenador mediante un wizard multi-paso.
 
 ---
