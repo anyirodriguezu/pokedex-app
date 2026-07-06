@@ -321,8 +321,9 @@ export const PokemonListScreen: React.FC<Props> = ({ navigation }) => {
             numColumns={2}
             contentContainerStyle={styles.listContent}
             initialNumToRender={10}
-            maxToRenderPerBatch={10}
-            windowSize={5}
+            maxToRenderPerBatch={6}
+            windowSize={10}
+            removeClippedSubviews={false}
             scrollEventThrottle={100}
             onScroll={handleScroll}
             onEndReached={() => {

@@ -29,6 +29,10 @@ export function getPokemonImageUrl(id: number): string {
   return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
 }
 
+export function getPokemonSpriteUrl(id: number): string {
+  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
+}
+
 export function getTextColor(bgHex: string): string {
   const r = parseInt(bgHex.slice(1, 3), 16);
   const g = parseInt(bgHex.slice(3, 5), 16);

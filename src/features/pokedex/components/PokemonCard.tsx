@@ -3,7 +3,7 @@ import { Image, StyleSheet, View } from 'react-native';
 import { Card, Text, YStack } from 'tamagui';
 import { Colors } from '../../../constants/colors';
 import { useTrainerStore } from '../../../store/trainerStore';
-import { capitalize, getPokemonImageUrl } from '../../../utils/pokemonHelpers';
+import { capitalize, getPokemonSpriteUrl } from '../../../utils/pokemonHelpers';
 import { PokemonWithId } from '../types/pokemon.types';
 import { SkeletonBlock } from './SkeletonBlock';
 
@@ -25,7 +25,7 @@ export const PokemonCard = React.memo(function PokemonCard({
   onPress,
 }: PokemonCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
-  const imageUrl = getPokemonImageUrl(pokemon.id);
+  const imageUrl = getPokemonSpriteUrl(pokemon.id);
   const paddedId = String(pokemon.id).padStart(3, '0');
   const isCaptured = useTrainerStore(
     (state) =>

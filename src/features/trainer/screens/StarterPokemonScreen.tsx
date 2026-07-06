@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as Haptics from 'expo-haptics';
-import React from 'react';
+import React, { useState } from 'react';
 import { Image, ScrollView, StyleSheet, View } from 'react-native';
 import { Button } from '../../../components/ui/Button';
 import { ErrorState } from '../../../components/ui/ErrorState';
@@ -36,6 +36,7 @@ export const StarterPokemonScreen: React.FC<Props> = ({ navigation }) => {
   const { data, isLoading, isError, refetch } = useStarterPokemon(
     profile?.favoritePokemonType ?? null
   );
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const handleAccept = () => {
     if (!data) return;
@@ -77,12 +78,20 @@ export const StarterPokemonScreen: React.FC<Props> = ({ navigation }) => {
         </YStack>
 
         <Card bg="$surface" rounded={20} p="$6" elevation={4} items="center" gap="$3">
-          <Image
-            source={{ uri: data.sprite }}
-            style={styles.image}
-            resizeMode="contain"
-            accessibilityLabel={`Imagen de ${data.name}`}
-          />
+          <View style={styles.imageContainer}>
+            {!imageLoaded && (
+              <View style={styles.skeletonOverlay}>
+                <SkeletonBlock width={200} height={200} borderRadius={100} />
+              </View>
+            )}
+            <Image
+              source={{ uri: data.sprite }}
+              style={[styles.image, !imageLoaded && styles.imageHidden]}
+              resizeMode="contain"
+              onLoad={() => setImageLoaded(true)}
+              accessibilityLabel={`Imagen de ${data.name}`}
+            />
+          </View>
           <Text
             fontSize={28}
             fontWeight="800"
@@ -111,9 +120,21 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 40,
   },
+  imageContainer: {
+    width: 200,
+    height: 200,
+  },
   image: {
     width: 200,
     height: 200,
+  },
+  imageHidden: {
+    opacity: 0,
+  },
+  skeletonOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
   },
   skeletonCard: {
     backgroundColor: Colors.surface,

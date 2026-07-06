@@ -14,6 +14,14 @@ Aplicación móvil construida con React Native y Expo SDK 54 que combina una Pok
 
 ---
 
+## Demo
+
+<p align="center">
+  <img src="assets/pokedex.gif" alt="Demo de la Pokédex App" width="320" />
+</p>
+
+---
+
 ## Instalar la app (Android)
 
 Descarga directa del APK — no requiere login ni cuenta de Expo:
