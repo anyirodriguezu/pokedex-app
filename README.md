@@ -27,7 +27,7 @@ Aplicación móvil construida con React Native y Expo SDK 54 que combina una Pok
 Descarga directa del APK — no requiere login ni cuenta de Expo:
 
 ```
-https://expo.dev/artifacts/eas/Bbv0pTrePrgHeaFm0PJPAz8DnV_vWA7ZWyNOZZXyWN4.apk
+https://expo.dev/artifacts/eas/j3nHRiD7n7B1m8hXNjGAjn5bzo89J_hg1oNkyYpAEyA.apk
 ```
 
 > Al instalar, Android pedirá activar **"Instalar de fuentes desconocidas"** — es normal para APKs distribuidos internamente.
