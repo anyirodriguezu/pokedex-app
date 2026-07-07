@@ -1,11 +1,13 @@
 import React from 'react';
-import { renderHook, act, waitFor } from '@testing-library/react-native';
+import { renderHook, act } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { usePokemonSearch } from '../usePokemonSearch';
 
+let queryClient: QueryClient;
+
 function createWrapper() {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
+  queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false, gcTime: 0 } },
   });
   function Wrapper({ children }: { children: React.ReactNode }) {
     return React.createElement(QueryClientProvider, { client: queryClient }, children);
@@ -20,6 +22,14 @@ const samplePokemons = [
 ];
 
 describe('usePokemonSearch', () => {
+  beforeEach(() => jest.useFakeTimers());
+
+  afterEach(() => {
+    jest.runAllTimers();
+    jest.useRealTimers();
+    queryClient.clear();
+  });
+
   it('returns all cached pokemons when search term is empty', async () => {
     const { result } = await renderHook(() => usePokemonSearch(samplePokemons), {
       wrapper: createWrapper(),
@@ -58,10 +68,10 @@ describe('usePokemonSearch', () => {
     await act(async () => {
       result.current.handleSearchChange('bulb');
     });
-    await waitFor(
-      () => expect(result.current.localResults).toHaveLength(1),
-      { timeout: 2000 }
-    );
+    await act(async () => {
+      jest.advanceTimersByTime(400);
+    });
+    expect(result.current.localResults).toHaveLength(1);
     expect(result.current.localResults[0].name).toBe('bulbasaur');
   });
 
@@ -72,10 +82,10 @@ describe('usePokemonSearch', () => {
     await act(async () => {
       result.current.handleSearchChange('25');
     });
-    await waitFor(
-      () => expect(result.current.localResults).toHaveLength(1),
-      { timeout: 2000 }
-    );
+    await act(async () => {
+      jest.advanceTimersByTime(400);
+    });
+    expect(result.current.localResults).toHaveLength(1);
     expect(result.current.localResults[0].name).toBe('pikachu');
   });
 
@@ -86,10 +96,10 @@ describe('usePokemonSearch', () => {
     await act(async () => {
       result.current.handleSearchChange('CHAR');
     });
-    await waitFor(
-      () => expect(result.current.localResults).toHaveLength(1),
-      { timeout: 2000 }
-    );
+    await act(async () => {
+      jest.advanceTimersByTime(400);
+    });
+    expect(result.current.localResults).toHaveLength(1);
     expect(result.current.localResults[0].name).toBe('charmander');
   });
 
@@ -114,13 +124,13 @@ describe('usePokemonSearch', () => {
     await act(async () => {
       result.current.handleSearchChange('char');
     });
-    await waitFor(
-      () => expect(result.current.debouncedTerm).toBe('char'),
-      { timeout: 2000 }
-    );
+    await act(async () => {
+      jest.advanceTimersByTime(400);
+    });
+    expect(result.current.debouncedTerm).toBe('char');
     await act(async () => {
       result.current.clearSearch();
     });
-    await waitFor(() => expect(result.current.localResults).toEqual(samplePokemons));
+    expect(result.current.localResults).toEqual(samplePokemons);
   });
 });

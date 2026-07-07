@@ -81,7 +81,9 @@ src/
 ├── store/                # trainerStore.ts (Zustand + AsyncStorage persist)
 ├── services/             # pokeApi.ts (fetch wrappers → PokéAPI v2)
 ├── components/ui/        # Button, EmptyState, ErrorState, SplashScreen,
-│                         # TrainerNameInputScreen, PokeballIcon, Modales
+│                         # TrainerNameInputScreen, PokeballIcon,
+│                         # ReleaseModal, MoveToBoxModal, TeamFullModal,
+│                         # TransferMachineModal
 ├── constants/            # colors.ts, api.ts
 ├── utils/                # pokemonHelpers.ts
 └── __mocks__/            # tamagui.tsx, @tamagui/config.ts (mocks para tests)
@@ -191,8 +193,14 @@ Primitivos correctos:
   (no desde `@testing-library/react-native` directamente — el helper envuelve en `TamaguiProvider`)
 - Mocks declarados en `jest.moduleNameMapper`: tamagui, @tamagui/config, AsyncStorage
 - `jest.setup.ts` suprime warnings de `act()` de react-hook-form/Yup/React 19 concurrente
-- Ejecutar: `npm test` / `npm run test:coverage`
-- Cobertura apuntada a: schemas, store, utils y componentes UI aislados
+- Ejecutar: `npm test` / `npm run test:watch` / `npm run test:coverage`
+- **Objetivo de cobertura: ≥ 80 %** — verificar con `npm run test:coverage` antes de cada PR
+- 31 archivos de test cubriendo: pantallas (PokemonListScreen, PokemonDetailScreen, TeamScreen,
+  Step1, Step2, StarterPokemon, SummaryScreen), hooks (usePokemonList, usePokemonDetail,
+  usePokemonTypeFilter, usePokemonSearch), componentes de animación (CaptureEffect, EscapeEffect,
+  ReleaseEffect, CapturedAura, PokemonEvolutionChain), modales (TransferMachineModal),
+  componentes UI (Button, EmptyState, ErrorState, SplashScreen, TrainerNameInputScreen),
+  servicios (pokeApi), store (trainerStore), schemas (step1Schema, step2Schema), utils
 
 ## Commits
 

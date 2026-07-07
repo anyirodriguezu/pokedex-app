@@ -16,9 +16,11 @@ const mockFetchRange = pokeApi.fetchPokemonRange as jest.MockedFunction<
   typeof pokeApi.fetchPokemonRange
 >;
 
+let queryClient: QueryClient;
+
 function createWrapper() {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
+  queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false, gcTime: 0 } },
   });
   function Wrapper({ children }: { children: React.ReactNode }) {
     return React.createElement(QueryClientProvider, { client: queryClient }, children);
@@ -37,6 +39,10 @@ const mockTypeResponse = {
 describe('usePokemonTypeFilter', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    queryClient.clear();
   });
 
   it('is disabled and returns empty results when typeSlug is null', async () => {
@@ -97,6 +103,10 @@ describe('usePokemonTypeFilter', () => {
 describe('usePokemonGenerationFilter', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    queryClient.clear();
   });
 
   it('is disabled and returns empty results when genIndex is null', async () => {

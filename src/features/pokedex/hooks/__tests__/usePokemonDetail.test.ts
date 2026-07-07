@@ -9,9 +9,11 @@ jest.mock('../../../../services/pokeApi');
 
 const mockFetch = pokeApi.fetchPokemonDetail as jest.MockedFunction<typeof pokeApi.fetchPokemonDetail>;
 
+let queryClient: QueryClient;
+
 function createWrapper() {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
+  queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false, gcTime: 0 } },
   });
   function Wrapper({ children }: { children: React.ReactNode }) {
     return React.createElement(QueryClientProvider, { client: queryClient }, children);
@@ -42,6 +44,10 @@ const mockDetail: PokemonDetail = {
 describe('usePokemonDetail', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    queryClient.clear();
   });
 
   it('does not fetch when id is 0 (disabled)', async () => {

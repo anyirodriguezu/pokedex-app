@@ -8,9 +8,11 @@ jest.mock('../../../../services/pokeApi');
 
 const mockFetch = pokeApi.fetchPokemonList as jest.MockedFunction<typeof pokeApi.fetchPokemonList>;
 
+let queryClient: QueryClient;
+
 function createWrapper() {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
+  queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false, gcTime: 0 } },
   });
   function Wrapper({ children }: { children: React.ReactNode }) {
     return React.createElement(QueryClientProvider, { client: queryClient }, children);
@@ -21,6 +23,10 @@ function createWrapper() {
 describe('usePokemonList', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    queryClient.clear();
   });
 
   it('starts with empty list while loading', async () => {

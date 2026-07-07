@@ -89,7 +89,9 @@ pokedex-app/
     ├── navigation/          # Navigators y tipos de rutas tipadas
     ├── store/               # Zustand store (trainerStore.ts)
     ├── services/            # Wrappers de fetch hacia APIs externas
-    ├── components/ui/       # Componentes compartidos entre features
+    ├── components/ui/       # Componentes compartidos: Button, EmptyState, ErrorState,
+    │                        # SplashScreen, TrainerNameInputScreen, PokeballIcon,
+    │                        # ReleaseModal, MoveToBoxModal, TeamFullModal, TransferMachineModal
     ├── constants/           # colors.ts, api.ts
     ├── utils/               # Funciones puras sin efectos
     └── __mocks__/           # Mocks de Tamagui para tests
@@ -259,15 +261,31 @@ chore: upgrade eslint-config-expo to 10.0.0
 
 - **Runner:** `jest-expo`
 - **Utilidades:** `@testing-library/react-native` 14
-- **Cobertura:** `npm run test:coverage`
+- **Cobertura objetivo: ≥ 80 %** — verificar con `npm run test:coverage` antes de abrir un PR
 
 ### Ejecutar
 
 ```bash
 npm test                  # Una sola pasada
 npm run test:watch        # Modo watch (desarrollo)
-npm run test:coverage     # Con reporte lcov
+npm run test:coverage     # Con reporte lcov (objetivo ≥ 80 %)
 ```
+
+### Cobertura actual
+
+El proyecto mantiene ≥ 80 % de cobertura de statements con 31 archivos de test distribuidos en todas las capas:
+
+| Capa | Archivos cubiertos |
+|---|---|
+| Pantallas | PokemonListScreen, PokemonDetailScreen, TeamScreen, Step1, Step2, StarterPokemon, SummaryScreen |
+| Hooks | usePokemonList, usePokemonDetail, usePokemonTypeFilter, usePokemonSearch |
+| Componentes | PokemonEvolutionChain, CaptureEffect, EscapeEffect, ReleaseEffect, CapturedAura |
+| Modales | TransferMachineModal |
+| Componentes UI | Button, EmptyState, ErrorState, SplashScreen, TrainerNameInputScreen |
+| Servicios | pokeApi (fetch wrappers) |
+| Store | trainerStore (captura, equipo, caja, persistencia) |
+| Schemas | step1Schema, step2Schema (validaciones Yup) |
+| Utils | pokemonHelpers |
 
 ### Dónde colocar los tests
 
@@ -304,9 +322,9 @@ Los siguientes mocks ya están declarados en `jest.moduleNameMapper` (no hace fa
 ### Qué testear
 
 - **Siempre:** schemas Yup (todos los casos válidos e inválidos), acciones del store Zustand, utilidades puras
-- **Importante:** hooks de React Query (mockeando el servicio de fetch)
-- **Útil:** componentes UI aislados (`Button`, `EmptyState`, `ErrorState`, `FormField`)
-- **Cuando sea posible:** screens con interacciones de usuario (formularios, botones)
+- **Importante:** hooks de React Query (mockeando el servicio de fetch), pantallas con interacciones de usuario
+- **Útil:** componentes UI aislados (`Button`, `EmptyState`, `ErrorState`, `FormField`), componentes de animación
+- **Objetivo:** mantener ≥ 80 % de cobertura — cada feature nueva debe llegar con sus tests
 
 ### Qué no testear
 
@@ -370,9 +388,10 @@ Descripción breve de los cambios.
 ## 8. Checklist antes de abrir un PR
 
 ```
-[ ] npm run typecheck    → sin errores TypeScript
-[ ] npm run lint         → sin warnings ESLint
-[ ] npm test             → todos los tests pasan
+[ ] npm run typecheck       → sin errores TypeScript
+[ ] npm run lint            → sin warnings ESLint
+[ ] npm test                → todos los tests pasan
+[ ] npm run test:coverage   → cobertura ≥ 80 %
 [ ] FlatList (no .map sobre ScrollView) para listas
 [ ] SafeAreaView desde react-native-safe-area-context (no desde react-native)
 [ ] Estilos con StyleSheet.create({}) o tokens Tamagui ($primary, etc.)
