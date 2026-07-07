@@ -9,7 +9,7 @@ jobs:
   build:
     name: Android Preview Build (local)
     runs-on: ubuntu-latest
-    environment: production
+    environment: env
 
     steps:
       - name: Checkout repository
