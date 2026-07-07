@@ -74,7 +74,7 @@ src/
 │   │   ├── screens/      # Step1PersonalDataScreen, Step2PreferencesScreen,
 │   │   │                 # StarterPokemonScreen, SummaryScreen
 │   │   └── types/        # trainer.types.ts
-│   └── team/             # Gestión del equipo activo y la caja
+│   └── team/             # Gestión del equipo activo y el Laboratorio Pokémon
 │       └── screens/      # TeamScreen
 ├── hooks/                # Hooks cross-feature: usePokemonSearch
 ├── navigation/           # RootNavigator, PokedexStack, TrainerStack, TeamStack, types.ts

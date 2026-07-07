@@ -84,7 +84,7 @@ pokedex-app/
     ├── features/            # Lógica organizada por funcionalidad
     │   ├── pokedex/         # Pokédex: lista, detalle, captura
     │   ├── trainer/         # Wizard de registro: datos, preferencias, Pokémon inicial
-    │   └── team/            # Gestión del equipo activo y la caja
+    │   └── team/            # Gestión del equipo activo y el Laboratorio Pokémon
     ├── hooks/               # Hooks cross-feature (ej. usePokemonSearch)
     ├── navigation/          # Navigators y tipos de rutas tipadas
     ├── store/               # Zustand store (trainerStore.ts)
@@ -283,7 +283,7 @@ El proyecto mantiene ≥ 80 % de cobertura de statements con 31 archivos de test
 | Modales | TransferMachineModal |
 | Componentes UI | Button, EmptyState, ErrorState, SplashScreen, TrainerNameInputScreen |
 | Servicios | pokeApi (fetch wrappers) |
-| Store | trainerStore (captura, equipo, caja, persistencia) |
+| Store | trainerStore (captura, equipo, Laboratorio Pokémon, persistencia) |
 | Schemas | step1Schema, step2Schema (validaciones Yup) |
 | Utils | pokemonHelpers |
 

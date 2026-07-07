@@ -11,7 +11,7 @@
 ![React Navigation](https://img.shields.io/badge/React_Navigation-7.x-6B52AE?style=flat)
 [![EAS Build](https://github.com/anyirodriguezu/pokedex-app/actions/workflows/eas-build.yml/badge.svg?branch=master)](https://github.com/anyirodriguezu/pokedex-app/actions/workflows/eas-build.yml)
 
-Aplicación móvil construida con React Native y Expo SDK 54 que combina una Pokédex interactiva con un sistema completo de registro de entrenador. Permite explorar la Pokédex, capturar Pokémon, gestionar tu equipo activo y caja, y construir tu perfil de entrenador mediante un wizard multi-paso.
+Aplicación móvil construida con React Native y Expo SDK 54 que combina una Pokédex interactiva con un sistema completo de registro de entrenador. Permite explorar la Pokédex, capturar Pokémon, gestionar tu equipo activo y el Laboratorio Pokémon, y construir tu perfil de entrenador mediante un wizard multi-paso.
 
 ---
 
@@ -51,11 +51,11 @@ Aplicación móvil construida con React Native y Expo SDK 54 que combina una Pok
 
 ### Mi Equipo
 - Equipo activo de hasta 6 Pokémon con slots vacíos visuales tipo Pokéball
-- Caja de almacenamiento ilimitada para Pokémon capturados
-- Mover Pokémon individualmente del equipo a la caja (MoveToBoxModal)
-- Máquina de transferencia (TransferMachineModal) con gestos de arrastre para mover Pokémon de la caja al equipo o hacer swap directo
+- Laboratorio Pokémon de almacenamiento ilimitado para Pokémon capturados
+- Mover Pokémon individualmente del equipo al Laboratorio Pokémon (MoveToBoxModal)
+- Máquina de transferencia (TransferMachineModal) con gestos de arrastre para mover Pokémon del Laboratorio Pokémon al equipo o hacer swap directo
 - Liberación de Pokémon con confirmación (ReleaseModal) y animación de efecto
-- Manejo automático cuando el equipo está lleno (TeamFullModal): el Pokémon capturado va directo a la caja
+- Manejo automático cuando el equipo está lleno (TeamFullModal): el Pokémon capturado va directo al Laboratorio Pokémon
 
 ### Registro de entrenador
 - Wizard de 3 pasos: datos personales (nombre, edad, email) → preferencias (distrito, tipo favorito) → selección de Pokémon inicial
@@ -88,7 +88,7 @@ flowchart TD
     G3 -- No --> G5[box\nalmacenamiento]
 
     H --> H1[Ver equipo activo\nslots con Pokéballs vacías]
-    H --> H2[Ver caja]
+    H --> H2[Ver Laboratorio Pokémon]
     H1 <-->|swap / mover| H2
     H1 --> H3[Liberar Pokémon]
 
@@ -223,7 +223,7 @@ El proyecto incluye 31 archivos de test con cobertura sobre las capas principale
 | Componentes | PokemonEvolutionChain, CaptureEffect, EscapeEffect, ReleaseEffect, CapturedAura |
 | Componentes UI | Button, EmptyState, ErrorState, SplashScreen, TrainerNameInputScreen, TransferMachineModal |
 | Servicios | pokeApi (fetch wrappers) |
-| Store | trainerStore (captura, equipo, caja, persistencia) |
+| Store | trainerStore (captura, equipo, Laboratorio Pokémon, persistencia) |
 | Schemas | step1Schema, step2Schema (validaciones Yup) |
 | Utils | pokemonHelpers |
 
@@ -313,7 +313,7 @@ Todos los datos de Pokémon provienen de [PokéAPI v2](https://pokeapi.co) — A
 | Formularios | react-hook-form + `Controller` | Validación declarativa sin `register` HTML |
 | Safe Area | `react-native-safe-area-context` | Requerido en Expo SDK 54 (`SafeAreaView` de RN core deprecado) |
 | Navegación swipe | `PanResponder` en cada tab | Transición entre tabs con gesto desde bordes de pantalla (32 px) |
-| Gestos de transferencia | `PanResponder` en TransferMachineModal | Arrastre de Pokémon de la caja al equipo con animación |
+| Gestos de transferencia | `PanResponder` en TransferMachineModal | Arrastre de Pokémon del Laboratorio Pokémon al equipo con animación |
 | Caché API | React Query `staleTime: 5 min` | Evita refetch innecesario al navegar entre pantallas |
 | Búsqueda | debounce 400 ms en `usePokemonSearch` | Evita peticiones por cada tecla pulsada |
 | Rehydration | `persist.onFinishHydration()` en AppShell | Garantiza que AsyncStorage esté listo antes de montar la UI |
