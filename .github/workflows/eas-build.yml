@@ -6,8 +6,79 @@ on:
       - master
 
 jobs:
-  build:
-    name: Android Preview Build (local)
+  build-android:
+    name: Android Preview Build (EAS cloud)
+    runs-on: ubuntu-latest
+    environment: env
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          echo "::group::npm install"
+          npm install --legacy-peer-deps
+          echo "::endgroup::"
+          echo "✅ Dependencies installed"
+
+      - name: Install EAS CLI
+        run: |
+          npm install -g eas-cli
+          echo "✅ EAS CLI version: $(eas --version)"
+
+      - name: Build Android (preview – EAS cloud)
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          echo "🚀 Submitting build to Expo cloud..."
+          eas build --platform android --profile preview --non-interactive
+          echo "✅ Build submitted and completed"
+
+      - name: Get APK URL and update README
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          echo "🔍 Fetching latest build info from EAS..."
+          LATEST=$(eas build:list --platform android --limit 1 --json --non-interactive)
+
+          echo "📦 Raw build response:"
+          echo "$LATEST" | jq '.[0] | {id, status, platform, artifacts}'
+
+          APK_URL=$(echo "$LATEST" | jq -r '.[0].artifacts.applicationArchiveUrl // empty')
+
+          if [ -z "$APK_URL" ]; then
+            echo "::error::APK URL not found in EAS response. Build may have failed or artifact is not ready."
+            echo "Full response: $LATEST"
+            exit 1
+          fi
+
+          echo "🔗 APK URL: $APK_URL"
+
+          echo "📝 Updating README.md line 30..."
+          CURRENT_LINE=$(sed -n '30p' README.md)
+          echo "   Before: $CURRENT_LINE"
+          sed -i "30s|.*|$APK_URL|" README.md
+          echo "   After:  $(sed -n '30p' README.md)"
+
+          echo "📤 Committing and pushing README update..."
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "chore: update APK download URL [skip ci]"
+          git push
+          echo "✅ README updated and pushed"
+
+  build-ios:
+    name: iOS Production Build (EAS cloud)
     runs-on: ubuntu-latest
     environment: env
 
@@ -21,26 +92,13 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
       - name: Setup EAS
         run: npm install -g eas-cli
 
-      - name: Build Android (preview – local)
+      - name: Build iOS (production – EAS cloud)
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: eas build --platform android --profile preview --non-interactive --local
-
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: pokedex-preview
-          path: build-*.apk
-          retention-days: 7
+        run: eas build --platform ios --profile production --non-interactive

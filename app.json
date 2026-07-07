@@ -21,7 +21,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anyirodriguezu.pokedexapp"
+      "bundleIdentifier": "com.anyirodriguezu.pokedexapp",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.anyirodriguezu.pokedexapp",
