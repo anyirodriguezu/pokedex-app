@@ -9,6 +9,7 @@ jobs:
   build:
     name: Android Preview Build (local)
     runs-on: ubuntu-latest
+    environment: production
 
     steps:
       - name: Checkout repository
@@ -31,10 +32,10 @@ jobs:
 
       - name: Setup EAS
         run: npm install -g eas-cli
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Build Android (preview – local)
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: eas build --platform android --profile preview --non-interactive --local
 
       - name: Upload APK artifact
