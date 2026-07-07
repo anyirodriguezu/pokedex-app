@@ -40,6 +40,7 @@ https://expo.dev/artifacts/eas/Bbv0pTrePrgHeaFm0PJPAz8DnV_vWA7ZWyNOZZXyWN4.apk
 - Lista infinita de Pokémon con scroll (20 por página, carga automática al llegar al final)
 - Búsqueda en tiempo real por nombre
 - Filtro por tipo (Fuego, Agua, Planta, Eléctrico, etc.) con 18 tipos disponibles
+- Filtro por generación (Gen 1 a Gen 9) combinable con el filtro por tipo
 - Pantalla de detalle con estadísticas base, habilidades, descripción de especie y cadena de evolución completa
 - Sistema de captura con animación de Pokéball y feedback háptico
 - Indicador visual de Pokémon ya capturados directamente en la lista

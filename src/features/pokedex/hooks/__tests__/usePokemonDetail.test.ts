@@ -83,7 +83,7 @@ describe('usePokemonDetail', () => {
   });
 
   it('is in loading state immediately after mount for a valid id', async () => {
-    mockFetch.mockResolvedValue(mockDetail);
+    mockFetch.mockImplementation(() => new Promise(() => {}));
 
     const { result } = await renderHook(() => usePokemonDetail(1), { wrapper: createWrapper() });
 
