@@ -9,6 +9,7 @@
 ![React Hook Form](https://img.shields.io/badge/React_Hook_Form-7.53.2-EC5990?style=flat&logo=reacthookform&logoColor=white)
 ![Tamagui](https://img.shields.io/badge/Tamagui-2.4.0-000?style=flat)
 ![React Navigation](https://img.shields.io/badge/React_Navigation-7.x-6B52AE?style=flat)
+[![EAS Build](https://github.com/anyirodriguezu/pokedex-app/actions/workflows/eas-build.yml/badge.svg?branch=master)](https://github.com/anyirodriguezu/pokedex-app/actions/workflows/eas-build.yml)
 
 Aplicación móvil construida con React Native y Expo SDK 54 que combina una Pokédex interactiva con un sistema completo de registro de entrenador. Permite explorar la Pokédex, capturar Pokémon, gestionar tu equipo activo y caja, y construir tu perfil de entrenador mediante un wizard multi-paso.
 
@@ -265,6 +266,27 @@ npm run submit:ios
 | `development` | APK/IPA con dev client | Interna |
 | `preview` | APK instalable | Interna |
 | `production` | App Bundle / IPA | Play Store / App Store |
+
+---
+
+## CI/CD
+
+El repositorio incluye un workflow de GitHub Actions en `.github/workflows/eas-build.yml` que se ejecuta automáticamente en cada Pull Request hacia `master`.
+
+### Android Preview Build
+
+| Step | Acción |
+|---|---|
+| `actions/checkout@v4` | Clona el repositorio |
+| `actions/setup-node@v4` | Node.js 20 con caché npm |
+| `npm install --legacy-peer-deps` | Instala dependencias |
+| `npm install -g eas-cli` | Instala EAS CLI |
+| `eas build --platform android --profile preview` | Dispara build en la nube de Expo usando `EXPO_TOKEN` |
+
+El APK generado queda disponible en el dashboard de Expo:
+[expo.dev/.../builds](https://expo.dev/accounts/anyirodriguezu/projects/pokedex-app/builds)
+
+> El build de iOS está declarado en el workflow pero deshabilitado — requiere cuenta de Apple Developer y certificados configurados en EAS.
 
 ---
 
