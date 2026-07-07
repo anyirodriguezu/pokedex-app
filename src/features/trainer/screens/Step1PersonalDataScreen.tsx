@@ -46,7 +46,7 @@ export const Step1PersonalDataScreen: React.FC<Props> = ({ navigation, route }) 
       } else {
         reset({ fullName: trainerName ?? '', age: undefined, email: '' });
       }
-    }, [isEditing, step1Data, reset])
+    }, [isEditing, step1Data, reset, trainerName])
   );
 
   const onSubmit = (data: Step1FormValues) => {

@@ -24,13 +24,14 @@ Aplicación móvil construida con React Native y Expo SDK 54 que combina una Pok
 
 ## Instalar la app (Android)
 
-Descarga directa del APK — no requiere login ni cuenta de Expo:
-
-```
-https://expo.dev/artifacts/eas/Bbv0pTrePrgHeaFm0PJPAz8DnV_vWA7ZWyNOZZXyWN4.apk
-```
+| Opción | Link | Detalle |
+|---|---|---|
+| Descarga directa (repositorio) | **[Descargar APK](https://github.com/anyirodriguezu/pokedex-app/raw/master/releases/application-c3c2921b-1696-4cc0-aa12-3a1dda31a150.apk)** | APK incluido en el repositorio |
+| Dashboard de Expo | **[expo.dev/.../builds](https://expo.dev/accounts/anyirodriguezu/projects/pokedex-app/builds)** | Siempre muestra las últimas versiones generadas — selecciona el build con perfil `preview` para descargar |
 
 > Al instalar, Android pedirá activar **"Instalar de fuentes desconocidas"** — es normal para APKs distribuidos internamente.
+
+> ⚠️ **Nota didáctica:** el APK está incluido en el repositorio únicamente para que el jurado del reto técnico pueda descargarlo directamente. En un proyecto real los binarios no se versionan en git — lo correcto es distribuirlos a través de la Play Store o un servicio como EAS o Firebase App Distribution.
 
 ---
 
